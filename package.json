@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --port 5180 --strictPort",
     "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "build:azure": "tsc -p tsconfig.json --noEmit && vite build --mode azure",
     "preview": "vite preview --port 5180 --strictPort",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node tests/run-unit.mjs",

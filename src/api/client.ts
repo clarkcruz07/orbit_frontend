@@ -2,8 +2,14 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 import { isAuthEndpoint, loginRedirectPath, shouldAttemptRefresh } from '@/lib/authLogic'
 
-/** All calls go to `/api/...`; Vite (dev) or the harness proxies and strips the prefix. */
-export const api = axios.create({ baseURL: '/api', timeout: 20000 })
+/**
+ * All calls go to `/api/...`; Vite (dev) or the harness proxies and strips the prefix. When the API lives on its own address (for example a
+ * separate Azure web app), the build sets VITE_API_BASE_URL to that address (no trailing slash, no /api) and calls go there directly.
+ */
+const configuredBase = String((import.meta as { env?: Record<string, string | undefined> }).env?.VITE_API_BASE_URL ?? '')
+  .trim()
+  .replace(/\/+$/, '')
+export const api = axios.create({ baseURL: configuredBase || '/api', timeout: 20000 })
 
 type Retriable = InternalAxiosRequestConfig & { _retried?: boolean }
 

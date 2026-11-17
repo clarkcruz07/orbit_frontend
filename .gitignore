@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+!.env.azure
 *.local
 
 # ---- dependencies and build output ----
