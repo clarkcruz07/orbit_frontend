@@ -1,0 +1,217 @@
+/* Shared UI atoms: buttons, alerts, skeletons, empty state, boot screen */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--control-h);
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font-size: var(--text-body);
+  font-weight: 500;
+  line-height: 1;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.btn-lg {
+  min-height: var(--control-h-lg);
+}
+.btn-block {
+  width: 100%;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(29, 91, 214, 0.28);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+.btn-secondary {
+  background: #fff;
+  border-color: var(--border-strong);
+  color: var(--ink);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--page-tint);
+  border-color: var(--ink-faint);
+}
+
+.ui-alert {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid;
+  font-size: var(--text-label);
+  line-height: 18px;
+}
+.ui-alert-danger {
+  background: #fff1f1;
+  border-color: #f6c3c3;
+  color: #8f1d1d;
+}
+.ui-alert-info {
+  background: var(--blue-50);
+  border-color: #c9defa;
+  color: var(--primary-ink);
+}
+.ui-alert-warning {
+  background: var(--gold-50);
+  border-color: #f4de9a;
+  color: var(--amber-ink);
+}
+
+.skeleton {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #e8edf8 25%, #f4f6fc 45%, #e8edf8 65%);
+  background-size: 300% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 520px;
+  margin: 8px auto;
+  padding: 36px 28px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.72);
+  text-align: center;
+}
+.empty-state-icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 14px;
+  border-radius: 18px;
+  background: var(--violet-50);
+  color: var(--violet-500);
+}
+.empty-state-badge {
+  margin-bottom: 8px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--gold-100);
+  color: var(--amber-ink);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.empty-state-title {
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 700;
+}
+.empty-state-body {
+  margin-top: 6px;
+  color: var(--ink-secondary);
+  font-size: var(--text-body);
+  line-height: 21px;
+}
+.empty-state-action {
+  margin-top: 18px;
+}
+
+.boot-screen {
+  display: grid;
+  gap: 14px;
+  place-items: center;
+  align-content: center;
+  min-height: 60vh;
+  padding: 24px;
+  color: var(--ink-secondary);
+}
+.boot-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--violet-100);
+  border-top-color: var(--violet-500);
+  border-radius: 50%;
+  animation: boot-spin 0.8s linear infinite;
+}
+@keyframes boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-state-plain {
+  max-width: none;
+  margin: 0;
+  padding: 22px 12px 8px;
+  border: 0;
+  background: transparent;
+}
+.empty-state-plain .empty-state-icon {
+  width: 48px;
+  height: 48px;
+}
+.empty-state-plain .empty-state-title {
+  font-size: 17px;
+}
+
+/* Touch targets: buttons are at least 44px tall on tablets and phones. */
+@media (max-width: 768px) {
+  .btn {
+    min-height: 44px;
+  }
+}
+
+/* ---------- payday cutoff (reimbursements and attendance corrections) ---------- */
+.payday-notice {
+  margin: 0 0 14px;
+}
+.payday-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+}
+.payday-pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--blue-100);
+  color: var(--primary-ink);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.payday-pill-deferred {
+  background: var(--gold-100);
+  color: var(--amber-ink);
+}
+.payday-landed {
+  margin: 8px 0 0;
+  color: var(--ink-body);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+td > .payday-badges,
+.r-card-item > .payday-badges,
+.ts-day-card > .payday-badges,
+.r-detail-head .payday-badges {
+  display: flex;
+  margin-top: 6px;
+}

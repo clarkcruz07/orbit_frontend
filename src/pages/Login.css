@@ -1,0 +1,169 @@
+/* Sign in sits outside the app shell: one centred card on the soft page background. */
+.login-container {
+  display: grid;
+  place-items: start center;
+  min-height: 100vh;
+  padding: 40px 16px;
+  background:
+    radial-gradient(900px 420px at 85% -10%, rgba(139, 124, 246, 0.16), transparent 70%),
+    radial-gradient(700px 360px at 5% 110%, rgba(47, 134, 240, 0.14), transparent 70%),
+    var(--page);
+}
+.login-stack {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 420px);
+  margin: auto 0;
+}
+.login-card {
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+.login-heading {
+  margin-bottom: 22px;
+  text-align: center;
+}
+.login-heading h1 {
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.login-heading p {
+  color: var(--ink-secondary);
+  font-size: var(--text-body);
+  line-height: 20px;
+}
+.login-card .ui-alert {
+  margin-bottom: 16px;
+}
+.login-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+.field {
+  display: grid;
+  gap: 6px;
+}
+.field-label {
+  color: var(--ink);
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+.field input {
+  width: 100%;
+  min-width: 0;
+  height: var(--control-h-lg);
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: #fff;
+  color: var(--ink);
+  font-size: var(--text-body);
+}
+.field input:focus {
+  border-color: var(--blue-500);
+  outline: 2px solid rgba(47, 134, 240, 0.25);
+  outline-offset: 0;
+}
+.login-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+/* Plain text, not a link: there is no password-reset flow, so it must not look clickable. */
+.login-forgot {
+  color: var(--ink-muted);
+  font-size: var(--text-label);
+}
+.password-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.password-row input {
+  flex: 1;
+}
+.password-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  height: var(--control-h-lg);
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: #fff;
+  color: var(--ink);
+  font-size: var(--text-label);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.password-toggle:hover {
+  background: var(--page-tint);
+}
+.password-toggle[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary-ink);
+}
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 16px;
+  color: var(--ink-muted);
+  font-size: var(--text-label);
+}
+.login-divider::before,
+.login-divider::after {
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+  content: '';
+}
+.login-sso-note {
+  margin-top: 12px;
+}
+/* Microsoft's four-colour mark keeps Microsoft's own colours. */
+.microsoft-mark {
+  display: grid;
+  grid-template-columns: repeat(2, 8px);
+  gap: 2px;
+}
+.microsoft-mark i {
+  width: 8px;
+  height: 8px;
+}
+.microsoft-mark i:nth-child(1) {
+  background: #f25022;
+}
+.microsoft-mark i:nth-child(2) {
+  background: #7fba00;
+}
+.microsoft-mark i:nth-child(3) {
+  background: #00a4ef;
+}
+.microsoft-mark i:nth-child(4) {
+  background: #ffb900;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 20px 12px;
+  }
+  .login-card {
+    padding: 24px 20px;
+  }
+}

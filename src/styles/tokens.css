@@ -1,0 +1,80 @@
+/* Bluedge People design tokens (SPEC section 9), refined against reference/hr-administration-reference.png */
+:root {
+  /* Brand */
+  --navy-900: #071d4d;
+  --navy-800: #08215a;
+  --navy-700: #0b2a63;
+  --navy-600: #123a82;
+  --blue-600: #1d6fe0;
+  --blue-500: #2f86f0;
+  --blue-400: #4aa3ff;
+  --blue-100: #e3efff;
+  --blue-50: #eef5ff;
+  --violet-600: #5b3fd1;
+  --violet-500: #6d5ae6;
+  --violet-400: #8b7cf6;
+  --violet-300: #b6a8fa;
+  --violet-100: #ece8ff;
+  --violet-50: #f4f1ff;
+  --gold-500: #f2b705;
+  --gold-400: #ffc928;
+  --gold-100: #fff1c7;
+  --gold-50: #fff8e1;
+  --green-600: #138a43;
+  --green-500: #1fa355;
+  --green-100: #dff5e8;
+  --red-500: #ef4b4b;
+  --red-600: #c92a2a;
+  --amber-ink: #8a5a00;
+
+  /* Ink */
+  --ink: #0b1f4d;
+  --ink-body: #1c2f5e;
+  --ink-secondary: #4a5b84;
+  --ink-muted: #7a87a8;
+  --ink-faint: #a3adc7;
+
+  /* Surfaces */
+  --page: #eff3fc;
+  --page-tint: #f6f8fe;
+  --surface: #ffffff;
+  --border: #e3e8f6;
+  --border-strong: #cdd5ea;
+  --hairline: #e9edf8;
+  --grid-line: #e4e9f5;
+
+  /* Primary action */
+  --primary: #1d5bd6;
+  --primary-hover: #174bb5;
+  --primary-ink: #123d96;
+  --primary-soft: #e6eefc;
+
+  /* Sidebar */
+  --sidebar-w: 280px;
+  --sidebar-top: #0b2a63;
+  --sidebar-bottom: #08215a;
+  --nav-active-from: #5b6cf0;
+  --nav-active-to: #8b7cf6;
+
+  /* Shape + elevation */
+  --radius-card: 14px;
+  --radius-control: 10px;
+  --radius-pill: 999px;
+  --shadow-card: 0 4px 14px rgba(40, 60, 140, 0.08);
+  --shadow-pop: 0 12px 32px rgba(18, 34, 90, 0.18);
+  --control-h: 40px;
+  --control-h-lg: 44px;
+
+  /* Type */
+  --font-sans: 'Roboto', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --text-title: 34px;
+  --text-card-title: 18px;
+  --text-numeral: 34px;
+  --text-body: 14px;
+  --text-label: 13px;
+  --text-caption: 12px;
+
+  /* Layout */
+  --header-h: 68px;
+  --content-pad: 18px;
+}

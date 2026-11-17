@@ -1,0 +1,540 @@
+/* Settings page. Tokens from styles/tokens.css only; every class is prefixed st- so nothing leaks to other pages. */
+.st-page {
+  max-width: 1020px;
+}
+
+/* ---------- tabs ---------- */
+.st-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 16px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.st-tab {
+  min-height: 36px;
+  border: 0;
+  padding: 0 14px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.st-tab:hover:not(.active) {
+  background: var(--page-tint);
+}
+.st-tab.active {
+  background: linear-gradient(90deg, var(--nav-active-from), var(--nav-active-to));
+  color: #fff;
+}
+.st-tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+.st-checking {
+  padding: 0 10px;
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+.st-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+/* ---------- panels ---------- */
+.st-panel {
+  padding: 18px 20px 16px;
+}
+.st-panel-head {
+  margin-bottom: 12px;
+}
+.st-panel-head .card-sub {
+  max-width: 760px;
+  line-height: 1.45;
+}
+
+/* ---------- rows with a switch ---------- */
+.st-rows {
+  display: grid;
+}
+.st-row,
+.st-setting,
+.st-catalog {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--hairline);
+}
+.st-rows .st-row:first-child,
+.st-setting:first-of-type {
+  border-top: 0;
+}
+.st-setting {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.st-tile {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #ece8ff, #e0dbff);
+  color: #4d3fd4;
+}
+.st-row-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.4;
+}
+.st-row-text strong {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+.st-row-text span {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+}
+.st-row-text .st-muted {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+.st-row-text .st-note {
+  color: var(--amber-ink);
+  font-size: 12.5px;
+}
+
+/* ---------- switch ---------- */
+.st-switch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 44px;
+  min-height: 40px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+.st-switch-track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  background: #b9c3dc;
+  transition: background-color 0.15s ease;
+}
+.st-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(18, 34, 90, 0.35);
+  transition: transform 0.15s ease;
+}
+.st-switch.on .st-switch-track {
+  background: linear-gradient(90deg, var(--nav-active-from), var(--nav-active-to));
+}
+.st-switch.on .st-switch-thumb {
+  transform: translateX(20px);
+}
+.st-switch.on {
+  color: var(--primary-ink);
+}
+.st-switch-state {
+  display: inline-block;
+  min-width: 24px;
+  text-align: left;
+}
+.st-switch:disabled {
+  cursor: progress;
+}
+.st-switch.busy .st-switch-track {
+  opacity: 0.6;
+}
+.st-switch:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- feedback ---------- */
+.st-feedback {
+  min-height: 22px;
+  margin-top: 6px;
+}
+.st-ok {
+  color: var(--green-600);
+  font-size: 13px;
+  font-weight: 500;
+}
+.st-feedback-error {
+  margin: 6px 0;
+}
+.st-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.st-error {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  max-width: 520px;
+}
+.st-skeleton {
+  display: grid;
+  gap: 10px;
+}
+.st-skeleton .skeleton {
+  border-radius: 12px;
+}
+.st-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin-top: 6px;
+  color: var(--primary);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.st-link:hover {
+  text-decoration: underline;
+}
+.st-link-button {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: underline;
+}
+.st-inline-error {
+  color: #8f1d1d;
+  font-size: 13px;
+}
+
+/* ---------- account facts ---------- */
+.st-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 28px;
+  margin: 0;
+}
+.st-fact {
+  min-width: 0;
+  padding: 11px 0;
+  border-top: 1px solid var(--hairline);
+}
+.st-fact dt {
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.st-fact dd {
+  margin: 3px 0 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.st-wrap {
+  overflow-wrap: anywhere;
+}
+
+/* ---------- badges ---------- */
+.st-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 11px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.st-badge-blue {
+  background: #dcebff;
+  color: #1d5bd6;
+}
+.st-badge-lavender {
+  background: #e6defd;
+  color: #5a3fd0;
+}
+.st-badge-amber {
+  background: #ffefc2;
+  color: #8a5a00;
+}
+.st-badge-grey {
+  background: #e9edf8;
+  color: var(--ink-secondary);
+}
+
+/* ---------- users ---------- */
+.st-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.st-search {
+  display: flex;
+  align-items: center;
+  flex: 1 1 280px;
+  gap: 10px;
+  min-width: 0;
+  min-height: var(--control-h);
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: #fff;
+  color: var(--ink-secondary);
+}
+.st-search:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(29, 91, 214, 0.18);
+}
+.st-search-input {
+  flex: 1;
+  min-width: 0;
+  min-height: calc(var(--control-h) - 2px);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--text-body);
+}
+.st-count {
+  margin: 4px 0 8px 2px;
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+}
+.st-table-wrap {
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+}
+.st-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.st-table th,
+.st-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--hairline);
+  text-align: left;
+  vertical-align: middle;
+}
+.st-table thead th {
+  background: var(--page-tint);
+  color: var(--ink-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.st-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.st-table tbody tr:hover {
+  background: #fafbff;
+}
+.st-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.st-person-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 8px;
+  min-width: 0;
+}
+.st-card-row .st-person-text {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+}
+.st-table td.st-email {
+  overflow-wrap: break-word;
+  word-break: normal;
+  min-width: 190px;
+}
+.st-person-text strong {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.st-muted {
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+.st-cards {
+  display: none;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.st-card-row {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: #fff;
+}
+.st-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.st-card-facts {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+.st-card-facts div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+}
+.st-card-facts dt {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+.st-card-facts dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+.st-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+.st-pager-label {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+}
+
+/* ---------- catalogs ---------- */
+.st-catalogs {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.st-catalogs .st-catalog:first-child {
+  border-top: 0;
+}
+.st-go {
+  flex: 0 0 auto;
+}
+
+/* ---------- responsive ---------- */
+/* The six-column table needs about 920px: below that (tablet, phone, narrow desktop) the rows become cards. */
+@media (max-width: 1280px) {
+  .st-table-wrap {
+    display: none;
+  }
+  .st-cards {
+    display: grid;
+  }
+}
+@media (max-width: 768px) {
+  .st-tab {
+    min-height: 44px;
+  }
+  .st-switch {
+    min-height: 44px;
+  }
+  .st-search,
+  .st-search-input {
+    min-height: 44px;
+  }
+  .st-search-input {
+    font-size: 16px;
+  }
+  .st-link {
+    min-height: 44px;
+  }
+    .st-clear {
+    flex: 1 1 100%;
+  }
+}
+@media (max-width: 640px) {
+  .st-panel {
+    padding: 14px 14px 12px;
+  }
+  .st-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .st-tabs {
+    width: 100%;
+  }
+  .st-tab {
+    flex: 1 1 auto;
+  }
+  .st-row {
+    align-items: flex-start;
+  }
+  .st-row .st-tile {
+    display: none;
+  }
+  .st-setting {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .st-catalog {
+    flex-wrap: wrap;
+  }
+  .st-catalog .st-go {
+    flex: 1 1 100%;
+  }
+  .st-catalog .st-tile {
+    display: none;
+  }
+  .st-pager .btn {
+    flex: 1 1 auto;
+  }
+  .st-pager-label {
+    order: -1;
+    flex: 1 1 100%;
+    text-align: center;
+  }
+}

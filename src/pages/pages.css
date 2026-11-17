@@ -1,0 +1,317 @@
+/* Shared styling for the simpler pages (Dashboard home, profile, placeholders, HR Requests, 404). */
+.page {
+  max-width: 1180px;
+}
+.page-title-block {
+  padding: 8px 0 18px 14px;
+}
+.page-eyebrow {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.page-eyebrow::after {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 26px;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--gold-400);
+  content: '';
+}
+.page-title-block h1 {
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+.page-title-block p {
+  margin-top: 6px;
+  color: var(--ink-secondary);
+  font-size: 16px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+.card-pad {
+  padding: 18px 20px;
+}
+.card h2 {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 700;
+}
+.card-sub {
+  margin-top: 3px;
+  color: var(--ink-secondary);
+  font-size: 13px;
+}
+
+.card-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* HR Requests */
+.request-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.request-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+.request-card-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 4px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ece8ff, #e0dbff);
+  color: #4d3fd4;
+}
+.request-card h2 {
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 700;
+}
+.request-card p {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+  line-height: 20px;
+}
+.request-card-live {
+  border-color: #c4d4f7;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.request-card-live:hover {
+  box-shadow: 0 8px 22px rgba(40, 60, 140, 0.16);
+  transform: translateY(-1px);
+}
+.request-card-live .request-card-icon {
+  background: linear-gradient(135deg, #e6f0ff, #d2e4ff);
+  color: #1d5bd6;
+}
+.request-card-open {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.request-card-soon {
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: none;
+}
+.request-card-soon h2 {
+  color: var(--ink-secondary);
+}
+.soon-tag {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: #eef1f9;
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Profile */
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+}
+.profile-card .avatar {
+  width: 84px;
+  height: 84px;
+  font-size: 28px;
+}
+.profile-card h2 {
+  font-size: 22px;
+}
+.profile-card .profile-role-line {
+  color: var(--ink-secondary);
+  font-size: 15px;
+}
+.profile-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+  padding: 20px 24px 24px;
+  border-top: 1px solid var(--hairline);
+}
+.profile-facts dt {
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.profile-facts dd {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.profile-readonly-note {
+  margin-top: 14px;
+}
+
+@media (max-width: 768px) {
+  .card-grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .page-title-block {
+    padding-left: 4px;
+  }
+  .page-title-block h1 {
+    font-size: 27px;
+  }
+}
+@media (max-width: 480px) {
+  .profile-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.browse-directory-row {
+  margin: 0 0 14px 4px;
+}
+
+/* Personal Dashboard: upcoming holidays and birthdays */
+.up-grid {
+  margin-top: 16px;
+}
+.up-list {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.up-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+}
+.up-row.own {
+  border-color: var(--violet-300);
+  background: var(--violet-50);
+}
+.up-date {
+  flex: 0 0 auto;
+  min-width: 64px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--blue-100);
+  color: var(--primary-ink);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+.up-row.own .up-date {
+  background: var(--violet-600);
+  color: #fff;
+}
+.up-text {
+  display: grid;
+  min-width: 0;
+  color: var(--ink);
+  font-size: 14px;
+}
+.up-text strong {
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------------------ My Profile: the HR profile sections (read-only) */
+.profile-sections {
+  margin-top: 16px;
+}
+.profile-sections-head {
+  margin: 0 0 10px 4px;
+}
+.profile-sections-head h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.profile-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+.profile-section {
+  min-width: 0;
+}
+.profile-section h3 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+.profile-section-sensitive {
+  border-style: dashed;
+}
+.profile-section-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 18px;
+  margin: 12px 0 0;
+}
+.profile-section-facts dt {
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.profile-section-facts dd {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-size: 14.5px;
+  overflow-wrap: anywhere;
+}
+.profile-muted {
+  color: var(--ink-muted) !important;
+  font-style: italic;
+}
+.profile-multiline {
+  white-space: pre-line;
+}
+@media (max-width: 1100px) {
+  .profile-sections-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .profile-section-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

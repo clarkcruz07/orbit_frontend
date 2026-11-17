@@ -1,0 +1,33 @@
+{
+  "name": "bluedge-people-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5180 --strictPort",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "preview": "vite preview --port 5180 --strictPort",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node tests/run-unit.mjs",
+    "test:browser": "node tests/browser/run.mjs"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "^3.28.0",
+    "@fontsource/roboto": "^5.1.0",
+    "axios": "^1.7.9",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "recharts": "^2.15.0",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "playwright-core": "^1.49.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
