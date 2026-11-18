@@ -228,6 +228,19 @@ test('live dashboard: nulls stay null, unavailable blocks are flagged with their
   assert.deepEqual(d.birthdays, [])
 })
 
+test('microsoft accounts block: absent means no card, present passes counts and roles through, degraded is flagged', () => {
+  assert.equal(m.normaliseDashboard(liveRaw()).microsoft_accounts, null)
+  const ok = m.normaliseDashboard({ ...liveRaw(), microsoft_accounts: { synced: 19, active_users: 12, not_signed_in: 7, roles: [{ role: 'Manager', count: 3 }, { role: '', count: 1 }, { role: 'X', count: 'n' }] } }).microsoft_accounts
+  assert.equal(ok.available, true)
+  assert.deepEqual([ok.synced, ok.active_users, ok.not_signed_in], [19, 12, 7])
+  assert.deepEqual(ok.roles, [{ role: 'Manager', count: 3 }])
+  const down = m.normaliseDashboard({ ...liveRaw(), microsoft_accounts: { synced: null, active_users: null, not_signed_in: null, roles: null, available: false, reason: 'Temporarily unavailable' } }).microsoft_accounts
+  assert.equal(down.available, false)
+  assert.equal(down.synced, null)
+  assert.deepEqual(down.roles, [])
+  assert.match(m.degradedNames(['microsoft_accounts']), /Microsoft accounts/)
+})
+
 test('dashboard with every block present: the numbers pass through untouched and every block is available', () => {
   const raw = {
     summary: { headcount: { value: 1248, delta_pct: 3.2, period: 'last_month' }, onboarding: { value: 24, status: 'in_progress' }, offboarding: { value: 7, status: 'in_progress' }, expiring_documents: { value: 36, window_days: 30 }, policy_acknowledgement: { pct: 96, delta_pp: 2 } },

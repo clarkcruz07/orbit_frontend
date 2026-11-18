@@ -165,6 +165,8 @@ function Dashboard({ data }: { data: DashboardModel }) {
           <DirectoryCard directory={data.directory} />
 
           <CasesCard cases={data.hr_cases} />
+
+          {data.microsoft_accounts ? <AccountsCard accounts={data.microsoft_accounts} /> : null}
         </div>
 
         <UpcomingCard birthdays={data.birthdays} holidays={data.holidays} failed={failed} />
@@ -312,6 +314,46 @@ function DirectoryCard({ directory }: { directory: DashboardModel['directory'] }
       ) : (
         <div className="directory-body">
           <NotAvailable title={unavailableTitle(directory.reason)} reason={unavailableReason(directory.reason)} minHeight={128} />
+        </div>
+      )}
+    </section>
+  )
+}
+
+function AccountsCard({ accounts }: { accounts: NonNullable<DashboardModel['microsoft_accounts']> }) {
+  return (
+    <section className="hr-card accounts-card" aria-labelledby="accts" data-testid="card-accounts" data-available={accounts.available ? undefined : 'false'}>
+      <CardHeader icon={UsersRound} title="Microsoft Accounts" subtitle="Synced people and who can sign in" action="Users and roles" actionTo="/settings" id="accts" />
+      {accounts.available ? (
+        <div className="accounts-body">
+          <ul className="accounts-rows">
+            <li data-testid="accounts-synced">
+              <span className="row-label">Synced from Microsoft</span>
+              <span className="row-value">{formatInt(accounts.synced)}</span>
+            </li>
+            <li data-testid="accounts-active">
+              <span className="row-label">Active users (Users and roles)</span>
+              <span className="row-value">{formatInt(accounts.active_users)}</span>
+            </li>
+            <li data-testid="accounts-waiting">
+              <span className="row-label">Not signed in yet</span>
+              <span className="row-value">{formatInt(accounts.not_signed_in)}</span>
+            </li>
+          </ul>
+          {accounts.roles.length > 0 ? (
+            <ul className="accounts-roles" aria-label="Active users by role">
+              {accounts.roles.map((r) => (
+                <li key={r.role} data-testid={`accounts-role-${r.role}`}>
+                  <span className="row-label">{r.role}</span>
+                  <span className="row-value">{formatInt(r.count)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : (
+        <div className="accounts-body">
+          <NotAvailable title={unavailableTitle(accounts.reason)} reason={unavailableReason(accounts.reason)} minHeight={128} />
         </div>
       )}
     </section>

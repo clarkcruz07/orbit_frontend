@@ -333,7 +333,11 @@ export function PeopleList() {
                           <button type="button" className="pm-x" onClick={() => setToDelete(p)} aria-label={`Delete ${p.employee.name}`} title="Delete this person for good" data-testid="delete-person">
                             <X size={16} aria-hidden="true" />
                           </button>
-                        ) : null}
+                        ) : (
+                          <button type="button" className="pm-x pm-x-locked" disabled aria-label={`Delete ${p.employee.name} (deactivate first)`} title="Deactivate this person first, then delete them" data-testid="delete-person-locked">
+                            <X size={16} aria-hidden="true" />
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )

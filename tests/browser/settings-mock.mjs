@@ -83,6 +83,7 @@ export function liveDashboard() {
     offboarding: na({ total: null, completed: null, in_progress: null, not_started: null, pct: null }),
     directory: { total: 19, full_time: 15, part_time: 2, contractor: 1, intern: 1 },
     hr_cases: { active: 4, high: 2, medium: 1, low: 1, avg_resolution_days: 0.0, delta_pct: null },
+    microsoft_accounts: { synced: 19, active_users: 12, not_signed_in: 7, roles: [{ role: 'Employee', count: 12 }, { role: 'HRAdmin', count: 2 }, { role: 'Manager', count: 3 }] },
     birthdays: [{ name: 'Carla Dizon', team: 'Compliance', date: 'Nov 23', avatar_initials: 'CD' }],
     holidays: [{ month: 'Nov', day: 30, name: 'Bonifacio Day', type: 'Public Holiday' }],
     unavailable_blocks: [],

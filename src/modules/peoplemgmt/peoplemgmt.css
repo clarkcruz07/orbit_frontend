@@ -645,6 +645,14 @@
   outline: 2px solid var(--red-600);
   outline-offset: 2px;
 }
+.pm-x-locked,
+.pm-x-locked:hover {
+  border-color: var(--hairline);
+  background: #fff;
+  color: var(--ink-secondary);
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 .pm-card-delete {
   margin-top: 6px;
   width: 100%;

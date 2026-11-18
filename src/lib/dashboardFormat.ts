@@ -202,6 +202,8 @@ export interface DashboardModel {
   offboarding: LifecycleModel
   directory: BlockState & { total: number | null; full_time: number | null; part_time: number | null; contractor: number | null; intern: number | null }
   hr_cases: BlockState & { active: number | null; high: number | null; medium: number | null; low: number | null; avg_resolution_days: number | null; delta_pct: number | null }
+  /** Synced Microsoft people vs the accounts on Users and roles. null when the server does not send the block: the card is then not shown. */
+  microsoft_accounts: (BlockState & { synced: number | null; active_users: number | null; not_signed_in: number | null; roles: { role: string; count: number }[] }) | null
   birthdays: { name: string; team: string; date: string; avatar_initials: string }[]
   holidays: { month: string | number; day: number; name: string; type: string }[]
   unavailable_blocks: string[]
@@ -217,6 +219,7 @@ export function normaliseDashboard(raw: unknown): DashboardModel {
   const pol = rec(s.policy_acknowledgement)
   const dir = rec(r.directory)
   const cases = rec(r.hr_cases)
+  const ms = rec(r.microsoft_accounts)
   const list = (v: unknown) => (Array.isArray(v) ? v.filter((x) => x && typeof x === 'object') : [])
   return {
     summary: {
@@ -233,6 +236,17 @@ export function normaliseDashboard(raw: unknown): DashboardModel {
     offboarding: lifecycle(r.offboarding),
     directory: { ...blockState(dir), total: num(dir.total), full_time: num(dir.full_time), part_time: num(dir.part_time), contractor: num(dir.contractor), intern: num(dir.intern) },
     hr_cases: { ...blockState(cases), active: num(cases.active), high: num(cases.high), medium: num(cases.medium), low: num(cases.low), avg_resolution_days: num(cases.avg_resolution_days), delta_pct: num(cases.delta_pct) },
+    microsoft_accounts: r.microsoft_accounts
+      ? {
+          ...blockState(ms),
+          synced: num(ms.synced),
+          active_users: num(ms.active_users),
+          not_signed_in: num(ms.not_signed_in),
+          roles: list(ms.roles)
+            .map((x) => ({ role: String(rec(x).role ?? ''), count: num(rec(x).count) }))
+            .filter((x): x is { role: string; count: number } => x.role !== '' && x.count !== null),
+        }
+      : null,
     birthdays: list(r.birthdays).map((b) => {
       const x = rec(b)
       return { name: String(x.name ?? ''), team: String(x.team ?? ''), date: String(x.date ?? ''), avatar_initials: String(x.avatar_initials ?? '') }
@@ -262,6 +276,7 @@ export function degradedNames(blocks: readonly string[]): string {
     headcount_trend: 'head count trend',
     directory: 'employee directory',
     hr_cases: 'HR cases',
+    microsoft_accounts: 'Microsoft accounts',
     expiring_documents: 'expiring documents',
     policy_acknowledgement: 'policy acknowledgement',
     birthdays: 'birthdays',

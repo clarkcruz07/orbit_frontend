@@ -407,6 +407,32 @@ ul {
   border-top: 0;
 }
 
+/* ---------- Microsoft accounts ---------- */
+.accounts-body {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  margin-top: 14px;
+}
+.accounts-rows,
+.accounts-roles {
+  flex: 1;
+  min-width: 0;
+}
+.accounts-roles {
+  padding-left: 14px;
+  border-left: 1px solid var(--hairline);
+}
+.accounts-rows li,
+.accounts-roles li {
+  height: 31px;
+  font-size: 13.5px;
+}
+.accounts-rows li:first-child,
+.accounts-roles li:first-child {
+  border-top: 0;
+}
+
 /* ---------- Cases ---------- */
 .cases-body {
   display: flex;
@@ -662,6 +688,13 @@ ul {
     flex-basis: auto;
   }
   .directory-rows {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .accounts-body {
+    flex-direction: column;
+  }
+  .accounts-roles {
     padding-left: 0;
     border-left: 0;
   }
