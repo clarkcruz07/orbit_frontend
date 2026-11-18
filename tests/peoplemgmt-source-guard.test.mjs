@@ -14,7 +14,7 @@ const noCr = (src) => src.replace(/\r/g, '')
 const withoutFormFromPerson = (src) => src.replace(/export function formFromPerson[\s\S]*?\n}\n/, '')
 
 test('the module has its pages, API, logic and routes', () => {
-  for (const f of ['api.ts', 'logic.ts', 'routes.tsx', 'parts.tsx', 'PeopleList.tsx', 'PersonNew.tsx', 'PersonDetail.tsx', 'PersonFields.tsx', 'AccountCard.tsx', 'PersonDialogs.tsx', 'ImportPage.tsx', 'ImportReportView.tsx', 'HolidaysPage.tsx', 'HolidayForm.tsx', 'RolesFields.tsx']) {
+  for (const f of ['api.ts', 'logic.ts', 'entraSync.ts', 'EntraSyncCard.tsx', 'routes.tsx', 'parts.tsx', 'PeopleList.tsx', 'PersonNew.tsx', 'PersonDetail.tsx', 'PersonFields.tsx', 'AccountCard.tsx', 'PersonDialogs.tsx', 'ImportPage.tsx', 'ImportReportView.tsx', 'HolidaysPage.tsx', 'HolidayForm.tsx', 'RolesFields.tsx']) {
     assert.ok(files.includes(`modules/peoplemgmt/${f}`), f)
   }
   const routes = readSrc('modules/peoplemgmt/routes.tsx')
@@ -54,7 +54,7 @@ test('every API path is one of the documented routes, and the only PUT is the ro
   const paths = [...api.matchAll(/api\s*\.(?:get|post|put|patch|delete)(?:<[^>]*>)?\(\s*[`']([^`']+)[`']/g)].map((m) => m[1].replace(/\$\{[^}]*\}/g, '{id}'))
   assert.deepEqual(
     [...new Set(paths)].sort(),
-    ['/directory/employees', '/holidays', '/holidays/{id}', '/people/employees', '/people/employees/import', '/people/employees/import/template', '/people/employees/{id}', '/people/employees/{id}/deactivate', '/people/employees/{id}/reactivate', '/people/employees/{id}/roles'].sort(),
+    ['/directory/employees', '/holidays', '/holidays/{id}', '/people/employees', '/people/employees/import', '/people/employees/import/template', '/people/employees/{id}', '/people/employees/{id}/deactivate', '/people/employees/{id}/reactivate', '/people/employees/{id}/roles', '/people/entra-sync/run', '/people/entra-sync/status'].sort(),
   )
   assert.deepEqual([...api.matchAll(/api\s*\.put(?:<[^>]*>)?\(\s*[`']([^`']+)/g)].map((m) => m[1].replace(/\$\{[^}]*\}/g, '{id}')), ['/people/employees/{id}/roles'])
 })

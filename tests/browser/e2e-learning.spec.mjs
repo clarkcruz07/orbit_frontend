@@ -506,6 +506,7 @@ test('E2E HR: compliance overview matches the API, names are HR-only, HR assigns
   await a.click('[data-testid=course-save]')
   await a.waitForSelector('[data-testid=admin-flash]')
   assert.match(await text(a, '[data-testid=admin-flash]'), /Course created: Fire Drill Practice \(E2E\)/)
+  await a.waitForFunction(() => document.querySelectorAll('[data-testid=admin-course-row]').length === 7)
   assert.equal(await a.locator('[data-testid=admin-course-row]').count(), 7)
   // a duplicate title is refused by the server and shown inline
   await a.click('[data-testid=admin-new-course]')

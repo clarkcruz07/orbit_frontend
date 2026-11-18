@@ -96,6 +96,55 @@ export function DeactivateDialog({ person, onClose, onDone }: DialogProps) {
   )
 }
 
+/** Plain-words consequences of deleting someone who has left. */
+export const DELETE_CONSEQUENCES: readonly string[] = [
+  'Their directory record, profile and sign-in account are deleted for good. This cannot be undone.',
+  'Their leave, reimbursement and timesheet history is kept and shows them as a former employee.',
+  'They are not added back by the Microsoft directory sync or by signing in. To bring them back, add them again as a new person.',
+]
+
+export function DeleteDialog({ person, onClose, onDeleted }: { person: Person; onClose: () => void; onDeleted: (name: string) => void }) {
+  const e = person.employee
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function run() {
+    if (busy) return
+    setBusy(true)
+    setError(null)
+    try {
+      await peopleApi.remove(e.employee_id)
+      onDeleted(e.name)
+    } catch (err) {
+      setError(failureMessage(parseFailure(err), 'The person could not be deleted.'))
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Modal title={`Delete ${e.name}?`} onClose={onClose} busy={busy} testId="delete-dialog">
+      <ul className="pm-consequences">
+        {DELETE_CONSEQUENCES.map((c) => (
+          <li key={c}>{c}</li>
+        ))}
+      </ul>
+      {error ? (
+        <div className="pm-dialog-error" data-testid="dialog-error">
+          <Alert tone="danger">{error}</Alert>
+        </div>
+      ) : null}
+      <div className="pm-dialog-actions">
+        <button type="button" className="btn btn-secondary" onClick={onClose} disabled={busy} data-autofocus data-testid="dialog-cancel">
+          Cancel
+        </button>
+        <button type="button" className="btn pm-btn-danger" onClick={run} disabled={busy} data-testid="delete-confirm">
+          {busy ? 'Deleting...' : `Delete ${e.name}`}
+        </button>
+      </div>
+    </Modal>
+  )
+}
+
 export function ReactivateDialog({ person, onClose, onDone }: DialogProps) {
   const e = person.employee
   const [busy, setBusy] = useState(false)

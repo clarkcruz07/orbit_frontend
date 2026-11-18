@@ -126,6 +126,11 @@
   background: var(--gold-50);
   color: var(--amber-ink);
 }
+.pm-notice-success {
+  border-color: #b9e3c9;
+  background: var(--green-100);
+  color: var(--green-600);
+}
 .pm-notice-row {
   margin-bottom: 14px;
 }
@@ -617,6 +622,34 @@
 .pm-btn-danger:hover:not(:disabled) {
   background: #fff1f1;
 }
+.pm-remove-col {
+  width: 52px;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+.pm-x {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #efb4b4;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--red-600);
+  cursor: pointer;
+}
+.pm-x:hover {
+  background: #fff1f1;
+}
+.pm-x:focus-visible {
+  outline: 2px solid var(--red-600);
+  outline-offset: 2px;
+}
+.pm-card-delete {
+  margin-top: 6px;
+  width: 100%;
+  justify-content: center;
+}
 .pm-btn-go {
   box-shadow: 0 2px 6px rgba(29, 91, 214, 0.28);
 }
@@ -1068,6 +1101,56 @@
 }
 @media (max-width: 768px) {
   .pm-clear-btn {
+    min-height: 44px;
+  }
+}
+
+
+/* ------------------------------------------------------------------ Microsoft directory sync card + source pill */
+.pm-name-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  min-width: 0;
+}
+.pm-sync {
+  margin: 0 0 16px;
+}
+.pm-sync-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+.pm-sync-text {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 280px;
+}
+.pm-sync-line {
+  margin: 0;
+  color: var(--ink-body);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.pm-sync-btn {
+  flex: 0 0 auto;
+}
+.pm-sync-notice,
+.pm-sync-stalled {
+  margin-top: 10px;
+}
+@media (max-width: 768px) {
+  .pm-sync-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .pm-sync-btn,
+  .pm-sync-stalled .btn {
+    width: 100%;
     min-height: 44px;
   }
 }

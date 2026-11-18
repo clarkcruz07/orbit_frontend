@@ -25,7 +25,7 @@ const HEAD = 'name,email,job_title,department,employment_type,manager_email,star
 
 const seedLong = (m, holidays) => {
   const p = m.state.people.find((x) => x.employee.employee_id === 'EMP-0100')
-  Object.assign(p.employee, { name: LONG_NAME, email: LONG_EMAIL, job_title: LONG_TITLE, department: 'Learning & Development and Organisational Effectiveness' })
+  Object.assign(p.employee, { name: LONG_NAME, email: LONG_EMAIL, job_title: LONG_TITLE, department: 'Learning & Development and Organisational Effectiveness', source: 'entra' })
   if (!holidays) return
   m.state.holidays.push({ holiday_id: 'h-long', name: LONG_HOLIDAY, type: 'company', date: '2026-03-03', month: null, day: null, active: true })
   m.state.holidays.push({ holiday_id: 'h-2', name: 'Founders Day', type: 'public', date: null, month: 12, day: 24, active: false })
@@ -33,6 +33,20 @@ const seedLong = (m, holidays) => {
 
 const routes = [
   { name: 'people list (long values)', path: '/people', ready: '[data-testid=people-row]' },
+  { name: 'people list (Microsoft directory: synced, pill on a long name)', path: '/people', ready: '[data-testid=entra-sync][data-view=synced]' },
+  { name: 'people list (Microsoft directory: running)', path: '/people', ready: '[data-testid=entra-sync][data-view=running]', entra: { state: 'running', pollsLeft: 9999 } },
+  {
+    name: 'people list (Microsoft directory: not connected, long hint)',
+    path: '/people',
+    ready: '[data-testid=entra-sync][data-view=not_configured]',
+    entra: { configured: false, enabled: false, last: null, next_run_at: null, setup_hint: 'Set the Microsoft directory sync client in the app settings (a very long application setting name such as PEOPLE_ENTRA_SYNC_CLIENT_SECRET_VALUE_NAME) and restart the service, then grant User.Read.All.' },
+  },
+  {
+    name: 'people list (Microsoft directory: failed)',
+    path: '/people',
+    ready: '[data-testid=entra-sync][data-view=failed]',
+    entra: { last: { started_at: null, finished_at: null, ok: false, error_code: 'partial_directory', counts: { fetched: 0, created: 0, updated: 0, deactivated: 0, reactivated: 0, skipped: 0 } } },
+  },
   { name: 'people list (no results)', path: `/people?q=${'x'.repeat(64)}`, ready: '[data-testid=empty-state]' },
   { name: 'people list (not available)', path: '/people', as: U.carla, ready: '[data-testid=people-denied]' },
   { name: 'new person', path: '/people/new', ready: '[data-testid=person-form]' },
@@ -166,6 +180,7 @@ for (const width of WIDTHS) {
       const mock = await startPeopleMock({ distDir: dist })
       seedLong(mock, r.seed)
       if (r.autosync) mock.state.autosync = { ...r.autosync }
+      if (r.entra) mock.state.entra = { ...mock.state.entra, ...r.entra }
       const user = r.as ?? U.anna
       const ctx = await browser.newContext({ viewport: { width, height: HEIGHT(width) } })
       await ctx.addInitScript((t) => localStorage.setItem('people.accessToken', t), `acc-${user.user_id}`)

@@ -38,7 +38,8 @@ function person(over = {}) {
       status: over.status ?? 'active',
       birthday: over.birthday ?? null,
       is_demo: false,
-      source: 'hr_created',
+      source: over.source ?? 'hr_created',
+      left_reason: over.left_reason ?? null,
       avatar_initials: initials(name),
       profile: over.profile ?? emptyProfile(),
     },
@@ -110,8 +111,29 @@ function multipartFile(buffer, contentType) {
   return buffer.subarray(headEnd + 4, next - 2)
 }
 
+const minutesAgo = (n) => new Date(Date.now() - n * 60000).toISOString()
+const hoursAhead = (n) => new Date(Date.now() + n * 3600000).toISOString()
+const ZERO_COUNTS = { fetched: 0, created: 0, updated: 0, deactivated: 0, reactivated: 0, skipped: 0 }
+
+/** The Microsoft directory sync as the server reports it. `outcome` is what the next run ends with ('ok' or an error_code); a run stays 'running' for `runPolls` status reads. */
+const entraDefaults = () => ({
+  configured: true,
+  enabled: true,
+  state: 'idle',
+  interval_hours: 6,
+  setup_hint: null,
+  last: { started_at: minutesAgo(6), finished_at: minutesAgo(5), ok: true, error_code: null, counts: { fetched: 30, created: 3, updated: 2, deactivated: 1, reactivated: 0, skipped: 0 } },
+  next_run_at: hoursAhead(3),
+  runPolls: 2,
+  pollsLeft: 0,
+  outcome: 'ok',
+  runCounts: { fetched: 33, created: 1, updated: 4, deactivated: 0, reactivated: 0, skipped: 0 },
+  startedAt: null,
+})
+
 export async function startPeopleMock({ distDir, extraPeople = 25 }) {
   const state = {
+    entra: entraDefaults(),
     people: seedPeople(extraPeople),
     holidays: [], // {holiday_id, name, type, date|null, month|null, day|null, active}
     // The server fills a year in on its own: 'ready' (nothing to do), 'pending' (fills in after `pendingPolls` more reads), 'failed', 'off' (no AI set up).
@@ -144,6 +166,26 @@ export async function startPeopleMock({ distDir, extraPeople = 25 }) {
   }
 
   const find = (id) => state.people.find((p) => p.employee.employee_id === id)
+  // A run that has stayed 'running' for `runPolls` reads finishes on the next read: the last-sync record is replaced and, when it worked, one person from Microsoft appears.
+  const finishRun = () => {
+    const e = state.entra
+    const ok = e.outcome === 'ok'
+    e.state = 'idle'
+    e.last = { started_at: e.startedAt, finished_at: new Date().toISOString(), ok, error_code: ok ? null : e.outcome, counts: ok ? { ...e.runCounts } : { ...ZERO_COUNTS } }
+    e.next_run_at = hoursAhead(e.interval_hours)
+    if (ok) {
+      const id = `EMP-ENTRA-${state.seq++}`
+      state.people.push(person({ employee_id: id, name: 'Zoe Entrada', email: `zoe.entrada.${id.toLowerCase()}@example.test`, source: 'entra', has_account: false }))
+    }
+  }
+  const entraView = () => {
+    const e = state.entra
+    if (e.state === 'running') {
+      if (e.pollsLeft > 0) e.pollsLeft -= 1
+      else finishRun()
+    }
+    return { configured: e.configured, enabled: e.enabled, state: e.state, interval_hours: e.interval_hours, last: e.last, next_run_at: e.next_run_at, setup_hint: e.setup_hint }
+  }
   const byEmail = (e) => state.people.find((p) => p.employee.email === e)
   const withName = (p) => ({ ...p, employee: { ...p.employee, manager: p.employee.manager_id ? { employee_id: p.employee.manager_id, name: find(p.employee.manager_id)?.employee.name ?? p.employee.manager_id } : null } })
   const out = (p, list = false) => {
@@ -437,6 +479,16 @@ export async function startPeopleMock({ distDir, extraPeople = 25 }) {
     // ---- people management: HR only
     if (route.startsWith('/people/')) {
       if (!hr) return send(res, 403, FORBIDDEN)
+      if (route === '/people/entra-sync/status' && method === 'GET') return send(res, 200, entraView())
+      if (route === '/people/entra-sync/run' && method === 'POST') {
+        const e = state.entra
+        if (!e.configured) return send(res, 409, { code: 'not_configured', detail: e.setup_hint ?? 'Microsoft directory sync is not connected.' })
+        if (e.state === 'running') return send(res, 409, { code: 'already_running', detail: 'A sync is already running' })
+        e.state = 'running'
+        e.pollsLeft = e.runPolls
+        e.startedAt = new Date().toISOString()
+        return send(res, 202, { state: 'running' })
+      }
       if (route === '/people/employees' && method === 'GET') {
         const q = (url.searchParams.get('q') ?? '').trim().toLowerCase()
         const status = url.searchParams.get('status')
@@ -478,6 +530,12 @@ export async function startPeopleMock({ distDir, extraPeople = 25 }) {
         const e = target.employee
         const a = target.account
         if (!sub && method === 'GET') return send(res, 200, out(target))
+        if (!sub && method === 'DELETE') {
+          if (state.deleteFails) return send(res, 409, { detail: 'This person still has active direct reports. Choose who they report to first.', code: 'has_direct_reports' })
+          if (e.status !== 'left') return send(res, 409, { detail: 'Only people who have left can be deleted. Deactivate them first.', code: 'not_left' })
+          state.people.splice(state.people.indexOf(target), 1)
+          return send(res, 200, { deleted: true, employee_id: e.employee_id })
+        }
         if (!sub && method === 'PATCH') {
           const allowed = ['name', 'email', 'job_title', 'department', 'employment_type', 'manager_id', 'start_date', 'birthday', 'can_sign_in', 'profile']
           if (body.__invalid || !Object.keys(body).length) return send(res, 422, { detail: 'Nothing to change', code: 'empty' })

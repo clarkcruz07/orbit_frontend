@@ -6,6 +6,7 @@ import { PageTitle } from '@/pages/PageTitle'
 import { Alert } from '@/ui/Feedback'
 import { EmptyState } from '@/ui/EmptyState'
 import { type Person, parseFailure, peopleApi } from './api'
+import { MICROSOFT_PILL_TITLE, isEntraSource, leftDirectoryHint } from './entraSync'
 import {
   accountBadge,
   birthdayLabel,
@@ -203,7 +204,17 @@ export function PersonDetail() {
                     {statusLabel(e.status)}
                   </Pill>
                   <Pill tone={badge.tone}>{badge.label}</Pill>
+                  {isEntraSource(e.source) ? (
+                    <Pill tone="violet" testId="source-pill" title={MICROSOFT_PILL_TITLE}>
+                      Microsoft
+                    </Pill>
+                  ) : null}
                 </span>
+                {leftDirectoryHint(e) ? (
+                  <span className="pm-sub" data-testid="left-directory-hint">
+                    {leftDirectoryHint(e)}
+                  </span>
+                ) : null}
               </div>
             </div>
             {!editing ? (

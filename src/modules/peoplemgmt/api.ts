@@ -5,6 +5,7 @@
  */
 import { api } from '@/api/client'
 import { normaliseProfile, type EmployeeProfile, type ProfileBody, type ProfilePatch } from '@/api/profile'
+import { normaliseSyncStatus, type SyncStatus } from './entraSync'
 
 export type { EmployeeProfile, ProfileBody, ProfilePatch } from '@/api/profile'
 
@@ -33,7 +34,10 @@ export interface PersonEmployee {
   status: PersonStatus | string
   birthday: string | null
   is_demo: boolean
+  /** Where the person came from: 'entra' (synced from Microsoft), 'hr_created', ... Anything the server omits reads as 'other'. */
   source: string
+  /** 'entra_sync' when the Microsoft sync marked this person as left. */
+  left_reason: string | null
   avatar_initials: string
   /** All five sections, always present (empty strings when not on file). The list omits the sensitive ones, so they read as empty there. */
   profile: EmployeeProfile
@@ -219,6 +223,7 @@ export function normalisePerson(raw: unknown): Person {
       birthday: nullableText(e.birthday),
       is_demo: e.is_demo === true,
       source: text(e.source, 'other'),
+      left_reason: nullableText(e.left_reason),
       avatar_initials: text(e.avatar_initials),
       profile: normaliseProfile(e.profile),
     },
@@ -308,6 +313,8 @@ export const peopleApi = {
   create: (body: CreateBody) => api.post<unknown>('/people/employees', body).then((r) => normalisePerson(r.data)),
   update: (id: string, body: PatchBody) => api.patch<unknown>(`/people/employees/${enc(id)}`, body).then((r) => normalisePerson(r.data)),
   deactivate: (id: string, body: DeactivateBody = {}) => api.post<unknown>(`/people/employees/${enc(id)}/deactivate`, body).then((r) => normalisePerson(r.data)),
+  /** Permanently deletes someone who has left (HR only). Their leave, reimbursement and timesheet history stays. */
+  remove: (id: string) => api.delete<unknown>(`/people/employees/${enc(id)}`).then(() => undefined),
   reactivate: (id: string) => api.post<unknown>(`/people/employees/${enc(id)}/reactivate`).then((r) => normalisePerson(r.data)),
   setRoles: (id: string, roles: string[]) => api.put<unknown>(`/people/employees/${enc(id)}/roles`, { roles }).then((r) => normalisePerson(r.data)),
   /** The CSV header row, fetched with the Bearer header and handed to the browser as a blob (never a URL with a token). */
@@ -317,6 +324,12 @@ export const peopleApi = {
     form.append('file', file)
     return api.post<unknown>('/people/employees/import', form, { params: { dry_run: dryRun }, timeout: IMPORT_TIMEOUT }).then((r) => normaliseReport(r.data))
   },
+}
+
+export const entraSyncApi = {
+  status: (signal?: AbortSignal) => api.get<unknown>('/people/entra-sync/status', { signal }).then((r): SyncStatus => normaliseSyncStatus(r.data)),
+  /** Starts a run in the background (202). 409 already_running / not_configured come back as errors the card words itself. */
+  run: () => api.post<unknown>('/people/entra-sync/run').then(() => undefined),
 }
 
 export const holidaysApi = {

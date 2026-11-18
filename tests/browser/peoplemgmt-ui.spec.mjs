@@ -25,7 +25,7 @@ test('list: HR sees the table with every column, badges, sorted by name, with Ad
     assert.equal(await page.locator('[data-testid=people-row]').count(), 20)
     assert.match(await text(page, '[data-testid=people-count]'), /Showing 1-20 of 30 people/)
     const heads = await page.$$eval('[data-testid=people-table] thead th', (els) => els.map((e) => e.textContent.trim()))
-    assert.deepEqual(heads, ['Name', 'Job title and department', 'Employment', 'Status', 'Roles', 'Sign-in'])
+    assert.deepEqual(heads, ['Name', 'Job title and department', 'Employment', 'Status', 'Roles', 'Sign-in', 'Delete'])
     const names = await page.$$eval('[data-testid=people-row] [data-testid=people-open]', (els) => els.map((e) => e.textContent.trim()))
     assert.deepEqual(names, [...names].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())))
     assert.equal(await page.getAttribute('[data-testid=add-person]', 'href'), '/people/new')

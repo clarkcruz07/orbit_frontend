@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, ShieldOff, Upload, UserPlus, UsersRound, X } from 'lucide-react'
+import { DeleteDialog } from './PersonDialogs'
 import { directoryApi } from '@/api/directory'
 import { Avatar } from '@/components/Avatar'
 import { PageTitle } from '@/pages/PageTitle'
 import { EmptyState } from '@/ui/EmptyState'
 import { type Person, parseFailure, peopleApi } from './api'
+import { EntraSyncCard } from './EntraSyncCard'
+import { MICROSOFT_PILL_TITLE, isEntraSource, leftDirectoryHint } from './entraSync'
 import {
   PAGE_SIZE,
   QUERY_MAX,
@@ -70,6 +73,10 @@ export function PeopleList() {
   const [load, setLoad] = useState<Load>({ kind: 'loading' })
   const [attempt, setAttempt] = useState(0)
   const [departments, setDepartments] = useState<string[]>([])
+  // The Microsoft directory card is for HR only. The people list answering at all is the proof: until then nothing asks about the sync.
+  const [listWorked, setListWorked] = useState(false)
+  const [toDelete, setToDelete] = useState<Person | null>(null)
+  const [flash, setFlash] = useState<string | null>(null)
   const seq = useRef(0)
 
   const update = useCallback(
@@ -116,6 +123,7 @@ export function PeopleList() {
         if (ctl.signal.aborted || mine !== seq.current) return
         if (view.items.length === 0 && view.total > 0 && page > 1) return update({ page: null }, true)
         setLoad({ kind: 'ready', view })
+        setListWorked(true)
       })
       .catch((err) => {
         if (ctl.signal.aborted || (err as { code?: string })?.code === 'ERR_CANCELED') return
@@ -169,6 +177,14 @@ export function PeopleList() {
   return (
     <div className="page pm-page" data-testid="people-list">
       {header}
+
+      {flash ? (
+        <p className="pm-notice pm-notice-success" role="status" data-testid="people-flash">
+          {flash}
+        </p>
+      ) : null}
+
+      {listWorked ? <EntraSyncCard onFinished={() => setAttempt((n) => n + 1)} /> : null}
 
       <form className="pm-toolbar" role="search" aria-label="People filters" onSubmit={(e) => e.preventDefault()}>
         <label className="pm-search">
@@ -258,6 +274,9 @@ export function PeopleList() {
                   <th scope="col">Status</th>
                   <th scope="col">Roles</th>
                   <th scope="col">Sign-in</th>
+                  <th scope="col" className="pm-remove-col">
+                    <span className="sr-only">Delete</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -269,9 +288,16 @@ export function PeopleList() {
                         <div className="pm-person">
                           <Avatar name={p.employee.name} initials={p.employee.avatar_initials || initialsOf(p.employee.name)} size={38} />
                           <div className="pm-person-text">
-                            <Link to={`/people/${encodeURIComponent(p.employee.employee_id)}`} className="pm-link" data-testid="people-open">
-                              {p.employee.name}
-                            </Link>
+                            <span className="pm-name-line">
+                              <Link to={`/people/${encodeURIComponent(p.employee.employee_id)}`} className="pm-link" data-testid="people-open">
+                                {p.employee.name}
+                              </Link>
+                              {isEntraSource(p.employee.source) ? (
+                                <Pill tone="violet" testId="source-pill" title={MICROSOFT_PILL_TITLE}>
+                                  Microsoft
+                                </Pill>
+                              ) : null}
+                            </span>
                             {p.employee.profile.personal.preferred_name ? (
                               <span className="pm-sub pm-wrap" data-testid="people-preferred">Goes by {p.employee.profile.personal.preferred_name}</span>
                             ) : null}
@@ -289,6 +315,11 @@ export function PeopleList() {
                           {statusLabel(p.employee.status)}
                         </Pill>
                         {p.employee.end_date ? <span className="pm-sub">Until {formatDate(p.employee.end_date)}</span> : null}
+                        {leftDirectoryHint(p.employee) ? (
+                          <span className="pm-sub" data-testid="left-directory-hint">
+                            {leftDirectoryHint(p.employee)}
+                          </span>
+                        ) : null}
                       </td>
                       <td className="pm-roles-cell">{p.account.has_account ? rolesText(p.account.roles) : <span className="pm-muted">-</span>}</td>
                       <td>
@@ -296,6 +327,13 @@ export function PeopleList() {
                           {badge.label}
                         </Pill>
                         <span className="pm-sub">{signInSourceShort(p.account.source)}</span>
+                      </td>
+                      <td className="pm-remove-col">
+                        {p.employee.status === 'left' ? (
+                          <button type="button" className="pm-x" onClick={() => setToDelete(p)} aria-label={`Delete ${p.employee.name}`} title="Delete this person for good" data-testid="delete-person">
+                            <X size={16} aria-hidden="true" />
+                          </button>
+                        ) : null}
                       </td>
                     </tr>
                   )
@@ -312,7 +350,14 @@ export function PeopleList() {
                   <Link to={`/people/${encodeURIComponent(p.employee.employee_id)}`} className="card pm-card" data-testid="people-card">
                     <Avatar name={p.employee.name} initials={p.employee.avatar_initials || initialsOf(p.employee.name)} size={44} />
                     <span className="pm-card-text">
-                      <strong>{p.employee.name}</strong>
+                      <span className="pm-name-line">
+                        <strong>{p.employee.name}</strong>
+                        {isEntraSource(p.employee.source) ? (
+                          <Pill tone="violet" testId="source-pill" title={MICROSOFT_PILL_TITLE}>
+                            Microsoft
+                          </Pill>
+                        ) : null}
+                      </span>
                       {p.employee.profile.personal.preferred_name ? <span className="pm-sub pm-wrap">Goes by {p.employee.profile.personal.preferred_name}</span> : null}
                       <span className="pm-sub pm-wrap">{p.employee.email}</span>
                       <span className="pm-card-meta pm-wrap">{[p.employee.job_title, p.employee.department].filter(Boolean).join(' - ')}</span>
@@ -321,9 +366,15 @@ export function PeopleList() {
                         <Pill tone={statusTone(p.employee.status)}>{statusLabel(p.employee.status)}</Pill>
                         <Pill tone={badge.tone}>{badge.label}</Pill>
                       </span>
+                      {leftDirectoryHint(p.employee) ? <span className="pm-card-meta">{leftDirectoryHint(p.employee)}</span> : null}
                       {p.account.has_account ? <span className="pm-card-meta">{rolesText(p.account.roles)}</span> : null}
                     </span>
                   </Link>
+                  {p.employee.status === 'left' ? (
+                    <button type="button" className="btn pm-btn-danger pm-card-delete" onClick={() => setToDelete(p)} data-testid="delete-person-card">
+                      <X size={16} aria-hidden="true" /> Delete {p.employee.name}
+                    </button>
+                  ) : null}
                 </li>
               )
             })}
@@ -331,6 +382,17 @@ export function PeopleList() {
 
           <Pager page={view.page} pageSize={PAGE_SIZE} total={view.total} shown={shown} onPage={(n) => update({ page: n > 1 ? String(n) : null })} testPrefix="people" />
         </>
+      ) : null}
+      {toDelete ? (
+        <DeleteDialog
+          person={toDelete}
+          onClose={() => setToDelete(null)}
+          onDeleted={(name) => {
+            setToDelete(null)
+            setFlash(`${name} was deleted.`)
+            setAttempt((n) => n + 1)
+          }}
+        />
       ) : null}
     </div>
   )
