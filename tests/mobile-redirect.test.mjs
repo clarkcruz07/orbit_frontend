@@ -11,7 +11,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const sandbox = { atob: (s) => Buffer.from(s, 'base64').toString('binary'), URLSearchParams }
 sandbox.window = sandbox
 vm.runInNewContext(readFileSync(join(root, 'public/mobile-redirect.js'), 'utf8'), sandbox)
-const { targetFor } = sandbox.mobileRedirect
+const { targetFor, androidIntentFor } = sandbox.mobileRedirect
 
 const b64url = (s) => Buffer.from(s).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 const query = (back, extra = 'code=abc123') => `?${extra}&state=${encodeURIComponent('n0nce.' + b64url(back))}`
@@ -50,6 +50,16 @@ test('refuses a missing, malformed or undecodable state', () => {
 test('Microsoft errors are forwarded too, so the app can show them', () => {
   const t = targetFor(query('bluedge-people://auth', 'error=access_denied&error_description=No'))
   assert.ok(t.includes('error=access_denied'))
+})
+
+test('Android gets an explicit open-Expo-Go link for an exp:// target, and nothing for other targets', () => {
+  const t = targetFor(query('exp://192.168.100.42:8081/--/auth'))
+  const i = androidIntentFor(t)
+  assert.ok(i.startsWith('intent://192.168.100.42:8081/--/auth?code=abc123'))
+  assert.ok(i.endsWith('#Intent;scheme=exp;package=host.exp.exponent;end'))
+  assert.equal(androidIntentFor(targetFor(query('bluedge-people://auth'))), null)
+  assert.equal(androidIntentFor(null), null)
+  assert.equal(androidIntentFor('https://evil.example/x?y=1'), null)
 })
 
 test('the static hosting config does not swallow the page into the app', () => {

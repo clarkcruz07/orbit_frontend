@@ -34,6 +34,17 @@
     return null
   }
 
-  if (typeof module !== 'undefined' && module.exports) module.exports = { targetFor: targetFor }
-  else root.mobileRedirect = { targetFor: targetFor }
+  /**
+   * Android only: an explicit "open this app" link for an Expo Go target. Chrome always honours it (it names the app), where it can
+   * refuse a bare exp:// link. null for anything else (the app's own build opens through its own link).
+   */
+  function androidIntentFor(target) {
+    var m = /^exp:\/\/([^?]+)\?(.*)$/.exec(target || '')
+    if (!m) return null
+    return 'intent://' + m[1] + '?' + m[2] + '#Intent;scheme=exp;package=host.exp.exponent;end'
+  }
+
+  var api = { targetFor: targetFor, androidIntentFor: androidIntentFor }
+  if (typeof module !== 'undefined' && module.exports) module.exports = api
+  else root.mobileRedirect = api
 })(typeof window !== 'undefined' ? window : this)

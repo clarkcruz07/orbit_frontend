@@ -10,6 +10,8 @@
     main{max-width:360px}
     h1{font-size:22px;margin:0 0 8px}
     p{font-size:15px;line-height:1.45;margin:0 0 20px;color:#4a5b84}
+    a.btn[hidden]{display:none}
+    a.alt{display:inline-block;margin-top:16px;color:#1d5bd6;font-size:14px}
     a.btn{display:block;min-height:48px;line-height:48px;border-radius:10px;background:#1d5bd6;color:#fff;font-weight:600;text-decoration:none}
   </style>
 </head>
@@ -20,6 +22,7 @@
     <h1>Sign-in complete</h1>
     <p id="msg">Tap the button to go back to the Bluedge People app.</p>
     <a id="open" class="btn" href="#" hidden>Open Bluedge People</a>
+    <a id="alt" class="alt" href="#" hidden>Did not open? Try this link instead</a>
   </main>
   <script src="/mobile-redirect.js"></script>
   <script>
@@ -31,8 +34,14 @@
         document.getElementById('msg').textContent = 'Close this page and start the sign-in again from the app.'
         return
       }
-      link.href = target
+      var intent = /Android/i.test(navigator.userAgent) ? window.mobileRedirect.androidIntentFor(target) : null
+      link.href = intent || target
       link.hidden = false
+      if (intent) {
+        var alt = document.getElementById('alt')
+        alt.href = target
+        alt.hidden = false
+      }
       // Some phones open the app straight away; others need the tap above (a link opened by a tap is always allowed).
       window.location.replace(target)
     })()
