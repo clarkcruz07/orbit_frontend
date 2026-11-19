@@ -72,6 +72,7 @@ export function PeopleList() {
   const debounced = useDebounced(text, 300)
   const [load, setLoad] = useState<Load>({ kind: 'loading' })
   const [attempt, setAttempt] = useState(0)
+  const [fetching, setFetching] = useState(false)
   const [departments, setDepartments] = useState<string[]>([])
   // The Microsoft directory card is for HR only. The people list answering at all is the proof: until then nothing asks about the sync.
   const [listWorked, setListWorked] = useState(false)
@@ -117,16 +118,19 @@ export function PeopleList() {
   useEffect(() => {
     const ctl = new AbortController()
     const mine = ++seq.current
-    setLoad({ kind: 'loading' })
+    setLoad((cur) => (cur.kind === 'ready' ? cur : { kind: 'loading' })) // keep the rows on screen while the next page loads: no blank flash
+    setFetching(true)
     loadView(q, status, department, page, ctl.signal)
       .then((view) => {
         if (ctl.signal.aborted || mine !== seq.current) return
+        setFetching(false)
         if (view.items.length === 0 && view.total > 0 && page > 1) return update({ page: null }, true)
         setLoad({ kind: 'ready', view })
         setListWorked(true)
       })
       .catch((err) => {
         if (ctl.signal.aborted || (err as { code?: string })?.code === 'ERR_CANCELED') return
+        setFetching(false)
         const f = parseFailure(err)
         if (f.status === 403) setLoad({ kind: 'denied' })
         else setLoad({ kind: 'error', message: failureMessage(f, 'The people list could not be loaded.') })
@@ -264,7 +268,7 @@ export function PeopleList() {
               The department filter looked at the first {SCAN_PAGES * SCAN_SIZE} matches only. Narrow the search to see the rest.
             </p>
           ) : null}
-          <div className="card pm-table-card" data-testid="people-table">
+          <div className={`card pm-table-card${fetching ? ' is-fetching' : ''}`} aria-busy={fetching} data-testid="people-table">
             <table className="pm-table">
               <thead>
                 <tr>
@@ -346,7 +350,7 @@ export function PeopleList() {
             </table>
           </div>
 
-          <ul className="pm-cards" data-testid="people-cards">
+          <ul className={`pm-cards${fetching ? ' is-fetching' : ''}`} aria-busy={fetching} data-testid="people-cards">
             {view.items.map((p) => {
               const badge = accountBadge(p)
               return (

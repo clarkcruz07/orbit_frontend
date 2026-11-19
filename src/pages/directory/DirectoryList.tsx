@@ -50,6 +50,7 @@ export function DirectoryList() {
   const [hrFields, setHrFields] = useState(false)
   const [departments, setDepartments] = useState<string[]>([])
   const [reloadKey, setReloadKey] = useState(0)
+  const [fetching, setFetching] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
 
   const update = useCallback(
@@ -81,17 +82,20 @@ export function DirectoryList() {
   useEffect(() => {
     let live = true
     const ctrl = new AbortController()
-    setLoad({ kind: 'loading' })
+    setLoad((cur) => (cur.kind === 'ready' ? cur : { kind: 'loading' })) // keep the rows on screen while the next page loads: no blank flash
+    setFetching(true)
     directoryApi
       .list({ q, department, employment_type: employmentType, page, page_size: PAGE_SIZE }, ctrl.signal)
       .then((data) => {
         if (!live) return
+        setFetching(false)
         setLoad({ kind: 'ready', data })
         if (pageHasHrFields(data.items)) setHrFields(true)
         if (data.departments.length) setDepartments(data.departments)
       })
       .catch((e: { code?: string; response?: { status?: number } }) => {
         if (!live || e?.code === 'ERR_CANCELED') return
+        setFetching(false)
         const status = e?.response?.status
         if (status === 403 && employmentType) {
           // Not allowed to filter by employment type: drop the filter and say so (the list then reloads without it).
@@ -234,7 +238,7 @@ export function DirectoryList() {
           <p className="dir-count" role="status" data-testid="dir-count">
             Showing {win.from}-{win.to} of {data.total} {data.total === 1 ? 'person' : 'people'}
           </p>
-          <div className="card r-table-card dir-table-card" data-testid="dir-table">
+          <div className={`card r-table-card dir-table-card${fetching ? ' is-fetching' : ''}`} aria-busy={fetching} data-testid="dir-table">
             <table className="r-table dir-table">
               <thead>
                 <tr>

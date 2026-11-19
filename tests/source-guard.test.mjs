@@ -45,15 +45,16 @@ test('HR Requests: only Reimbursements and "Browse the directory" are links; the
   assert.ok(!/<button\b/.test(src))
 })
 
-test('dashboard "View ..." actions are non-interactive MutedAction text; "Go to Directory" is the only real link', () => {
+test('dashboard "View ..." actions are non-interactive MutedAction text; "Go to Directory" and "Users and roles" are the only real links', () => {
   const src = readSrc('pages/hr/HrAdministration.tsx')
   const parts = readSrc('pages/hr/parts.tsx')
   assert.ok(!/<a\b/.test(src) && !/<a\b/.test(parts))
-  // The one <Link> of the card headers lives in CardLink (parts.tsx); the only card that passes actionTo is the Employee Directory card.
+  // The one <Link> of the card headers lives in CardLink (parts.tsx); the only cards that pass actionTo are Employee Directory and Microsoft Accounts.
   assert.equal((src.match(/<Link\b/g) || []).length, 0)
   assert.equal((parts.match(/<Link\b/g) || []).length, 1)
-  assert.equal((src.match(/actionTo="/g) || []).length, 1)
+  assert.equal((src.match(/actionTo="/g) || []).length, 2)
   assert.ok(/action="Go to Directory" actionTo="\/directory"/.test(src))
+  assert.ok(/action="Users and roles" actionTo="\/settings\?tab=users"/.test(src))
   const buttons = src.match(/<button\b[\s\S]*?>/g) || []
   // The only button is the error-state "Try again", which has an onClick handler.
   assert.equal(buttons.length, 1)

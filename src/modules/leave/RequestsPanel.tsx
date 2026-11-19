@@ -34,14 +34,17 @@ export function RequestsPanel({ scope, showEmployee, types, years, allowStatusFi
   const year = years.includes(yearRaw) ? yearRaw : 0
   const page = parsePage(params.get('page'))
   const [load, setLoad] = useState<Load>({ kind: 'loading' })
+  const [fetching, setFetching] = useState(false)
 
   const run = useCallback(() => {
     let live = true
-    setLoad({ kind: 'loading' })
+    setLoad((cur) => (cur.kind === 'ready' ? cur : { kind: 'loading' })) // keep the rows on screen while the next page loads: no blank flash
+    setFetching(true)
     leaveApi
       .list({ scope, status: allowStatusFilter ? status || undefined : undefined, type_id: typeId || undefined, year: year || undefined, page, page_size: PAGE_SIZE })
       .then((data) => {
         if (!live) return
+        setFetching(false)
         // A stale page number (the list shrank) falls back to the last real page instead of an empty screen.
         const last = Math.max(1, Math.ceil(data.total / PAGE_SIZE))
         if (data.items.length === 0 && page > last) {
@@ -55,6 +58,7 @@ export function RequestsPanel({ scope, showEmployee, types, years, allowStatusFi
       })
       .catch((e) => {
         if (!live) return
+        setFetching(false)
         const info = parseLeaveError(e, 'The requests could not be loaded.')
         setLoad({ kind: 'error', message: friendlyError(info), forbidden: info.status === 403 })
       })
@@ -167,7 +171,9 @@ export function RequestsPanel({ scope, showEmployee, types, years, allowStatusFi
         />
       ) : (
         <>
-          <RequestList items={load.data.items} showEmployee={showEmployee} />
+          <div className={fetching ? 'is-fetching' : undefined} aria-busy={fetching}>
+            <RequestList items={load.data.items} showEmployee={showEmployee} />
+          </div>
           <Pager total={load.data.total} page={load.data.page} pageSize={load.data.page_size} onPage={(p) => setParam('page', p > 1 ? String(p) : '')} />
         </>
       )}

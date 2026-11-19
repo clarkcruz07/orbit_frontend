@@ -230,14 +230,14 @@ test('live dashboard: nulls stay null, unavailable blocks are flagged with their
 
 test('microsoft accounts block: absent means no card, present passes counts and roles through, degraded is flagged', () => {
   assert.equal(m.normaliseDashboard(liveRaw()).microsoft_accounts, null)
-  const ok = m.normaliseDashboard({ ...liveRaw(), microsoft_accounts: { synced: 19, active_users: 12, not_signed_in: 7, roles: [{ role: 'Manager', count: 3 }, { role: '', count: 1 }, { role: 'X', count: 'n' }] } }).microsoft_accounts
+  const ok = m.normaliseDashboard({ ...liveRaw(), microsoft_accounts: { synced: 19, active_users: 12, not_signed_in: 7, by_role: [{ role: 'Manager', count: 3 }, { role: '', count: 1 }, { role: 'X', count: 'n' }] } }).microsoft_accounts
   assert.equal(ok.available, true)
   assert.deepEqual([ok.synced, ok.active_users, ok.not_signed_in], [19, 12, 7])
-  assert.deepEqual(ok.roles, [{ role: 'Manager', count: 3 }])
-  const down = m.normaliseDashboard({ ...liveRaw(), microsoft_accounts: { synced: null, active_users: null, not_signed_in: null, roles: null, available: false, reason: 'Temporarily unavailable' } }).microsoft_accounts
+  assert.deepEqual(ok.by_role, [{ role: 'Manager', count: 3 }])
+  const down = m.normaliseDashboard({ ...liveRaw(), microsoft_accounts: { synced: null, active_users: null, not_signed_in: null, by_role: null, available: false, reason: 'Temporarily unavailable' } }).microsoft_accounts
   assert.equal(down.available, false)
   assert.equal(down.synced, null)
-  assert.deepEqual(down.roles, [])
+  assert.deepEqual(down.by_role, [])
   assert.match(m.degradedNames(['microsoft_accounts']), /Microsoft accounts/)
 })
 

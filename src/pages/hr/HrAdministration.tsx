@@ -123,7 +123,7 @@ function Dashboard({ data }: { data: DashboardModel }) {
       <div className="hr-grid">
         <div className="hr-left">
           <section className="hr-card hr-trend" aria-labelledby="h-trend" data-testid="card-headcount-trend">
-            <CardHeader icon={Users} title="Headcount Trend" subtitle="Total employees over time" action="View Details" id="h-trend" />
+            <CardHeader icon={Users} title="Headcount Trend" subtitle="Synced accounts minus Users and roles, by year" action="View Details" id="h-trend" />
             {data.headcount_trend.length > 0 ? (
               <HeadcountChart data={data.headcount_trend} />
             ) : (
@@ -323,7 +323,7 @@ function DirectoryCard({ directory }: { directory: DashboardModel['directory'] }
 function AccountsCard({ accounts }: { accounts: NonNullable<DashboardModel['microsoft_accounts']> }) {
   return (
     <section className="hr-card accounts-card" aria-labelledby="accts" data-testid="card-accounts" data-available={accounts.available ? undefined : 'false'}>
-      <CardHeader icon={UsersRound} title="Microsoft Accounts" subtitle="Synced people and who can sign in" action="Users and roles" actionTo="/settings" id="accts" />
+      <CardHeader icon={UsersRound} title="Microsoft Accounts" subtitle="Synced people and who can sign in" action="Users and roles" actionTo="/settings?tab=users" id="accts" />
       {accounts.available ? (
         <div className="accounts-body">
           <ul className="accounts-rows">
@@ -340,9 +340,9 @@ function AccountsCard({ accounts }: { accounts: NonNullable<DashboardModel['micr
               <span className="row-value">{formatInt(accounts.not_signed_in)}</span>
             </li>
           </ul>
-          {accounts.roles.length > 0 ? (
+          {accounts.by_role.length > 0 ? (
             <ul className="accounts-roles" aria-label="Active users by role">
-              {accounts.roles.map((r) => (
+              {accounts.by_role.map((r) => (
                 <li key={r.role} data-testid={`accounts-role-${r.role}`}>
                   <span className="row-label">{r.role}</span>
                   <span className="row-value">{formatInt(r.count)}</span>

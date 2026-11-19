@@ -215,3 +215,10 @@ td > .payday-badges,
   display: flex;
   margin-top: 6px;
 }
+
+/* A list that is fetching its next page keeps its rows on screen (no blank flash, no scroll jump) and is dimmed until the new rows arrive. */
+.is-fetching {
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}

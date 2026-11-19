@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ClipboardCheck, Plus, Receipt } from 'lucide-react'
+import { ClipboardCheck, FileSpreadsheet, Plus, Receipt } from 'lucide-react'
 import { reimbursementsApi, type ReimbursementSummary } from '@/api/reimbursements'
 import { useAuthStore } from '@/stores/authStore'
 import { Alert, Skeleton } from '@/ui/Feedback'
 import { EmptyState } from '@/ui/EmptyState'
 import { PaydayBadge } from '@/ui/Payday'
 import { normalisePayday } from '@/lib/payday'
+import { saveBlob } from '@/modules/assistant/download'
 import { PageTitle } from '../PageTitle'
 import { StatusPill } from './parts'
 import { SCOPE_LABEL, STATUS_ORDER, availableScopes, formatDate, formatDateTime, formatMoney, parseScope, statusLabel, parseServerError, type Scope } from './logic'
@@ -28,6 +29,8 @@ export function ReimbursementsList() {
 
   const [items, setItems] = useState<ReimbursementSummary[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
 
   const load = useCallback(() => {
     let live = true
@@ -58,6 +61,23 @@ export function ReimbursementsList() {
   }
 
   const showEmployee = scope !== 'mine'
+
+  /** Downloads exactly what this tab and status filter show, as an Excel file. */
+  async function exportToExcel() {
+    if (exporting) return
+    setExporting(true)
+    setExportError(null)
+    try {
+      const res = await reimbursementsApi.exportXlsx(scope, status || undefined)
+      const day = new Date()
+      const stamp = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
+      saveBlob(res.data, `reimbursements-${scope}${status ? `-${status}` : ''}-${stamp}.xlsx`)
+    } catch (err) {
+      setExportError(parseServerError(err, 'The Excel file could not be created. Please try again.').detail)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <div className="page r-page" data-testid="reimb-list">
@@ -91,12 +111,20 @@ export function ReimbursementsList() {
               ))}
             </select>
           </label>
+          <button type="button" className="btn btn-secondary" onClick={() => void exportToExcel()} disabled={exporting || items === null || items.length === 0} data-testid="export-xlsx" title="Download these requests as an Excel file">
+            <FileSpreadsheet size={16} aria-hidden="true" /> {exporting ? 'Preparing...' : 'Export to Excel'}
+          </button>
           <Link to="/reimbursements/new" className="btn btn-primary" data-testid="new-reimbursement">
             <Plus size={16} aria-hidden="true" /> New reimbursement
           </Link>
         </div>
       </div>
       <p className="r-scope-sub">{SUBTITLE[scope]}</p>
+      {exportError ? (
+        <div data-testid="export-error">
+          <Alert tone="danger">{exportError}</Alert>
+        </div>
+      ) : null}
 
       {error ? (
         <div data-testid="list-error">

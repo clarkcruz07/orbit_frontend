@@ -22,7 +22,7 @@ export interface HrDashboard {
   offboarding: LifecycleBlock
   directory: { total: number; full_time: number; part_time: number; contractor: number; intern: number }
   hr_cases: { active: number; high: number; medium: number; low: number; avg_resolution_days: number; delta_pct: number }
-  microsoft_accounts?: { synced: number; active_users: number; not_signed_in: number; roles: { role: string; count: number }[] }
+  microsoft_accounts?: { synced: number; active_users: number; not_signed_in: number; by_role: { role: string; count: number }[] }
   birthdays: { name: string; team: string; date: string; avatar_initials: string }[]
   holidays: { month: string | number; day: number; name: string; type: string }[]
 }

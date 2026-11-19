@@ -121,6 +121,40 @@ test('list: employee sees only "My requests", status pills, merchant/amount/date
     await page.waitForURL(/\/reimbursements\/[0-9a-f-]{36}$/)
   }))
 
+test('list: Export to Excel downloads what the tab and status filter show, and an error is said in plain words', opts, () =>
+  withApp(async ({ page, mock, rs }) => {
+    rs.requests.push(draftWithReceipt({ purpose: 'Client lunch' }), makeRequest({ purpose: 'Printing', status: 'clarification_requested', stage: 'manager', submitted_at: new Date().toISOString() }))
+    await login(page, mock, CARLA)
+    await page.goto(`${mock.origin}/reimbursements`)
+    await page.waitForSelector('[data-testid=reimb-row]')
+
+    const [download] = await Promise.all([page.waitForEvent('download'), page.click('[data-testid=export-xlsx]')])
+    assert.match(download.suggestedFilename(), /^reimbursements-mine-\d{4}-\d{2}-\d{2}\.xlsx$/)
+    assert.deepEqual(rs.exports, [{ scope: 'mine', status: null }])
+
+    // the status filter goes into the request and the file name
+    await page.selectOption('[data-testid=status-filter]', 'draft')
+    await page.waitForFunction(() => document.querySelectorAll('[data-testid=reimb-row]').length === 1)
+    const [second] = await Promise.all([page.waitForEvent('download'), page.click('[data-testid=export-xlsx]')])
+    assert.match(second.suggestedFilename(), /^reimbursements-mine-draft-\d{4}-\d{2}-\d{2}\.xlsx$/)
+    assert.deepEqual(rs.exports[1], { scope: 'mine', status: 'draft' })
+
+    // a server failure is shown, and the button works again afterwards
+    rs.exportError = 500
+    await page.click('[data-testid=export-xlsx]')
+    await page.waitForSelector('[data-testid=export-error]')
+    assert.match(await text(page, '[data-testid=export-error]'), /Excel file could not be created/)
+    assert.equal(await page.isEnabled('[data-testid=export-xlsx]'), true)
+  }))
+
+test('list: the export button is off when there is nothing to export', opts, () =>
+  withApp(async ({ page, mock }) => {
+    await login(page, mock, CARLA)
+    await page.goto(`${mock.origin}/reimbursements`)
+    await page.waitForSelector('[data-testid=new-reimbursement]')
+    await page.waitForFunction(() => document.querySelector('[data-testid=export-xlsx]')?.disabled === true)
+  }))
+
 test('list: tabs depend on the account (Manager: 3 incl. review; HR: mine + all; Finance: 3) and review lists only decidable items', opts, () =>
   withApp(async ({ page, mock, rs }) => {
     rs.requests.push(

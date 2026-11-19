@@ -19,6 +19,7 @@ export function UsersTab() {
   const debounced = useDebounced(text, 300)
   const [load, setLoad] = useState<Load>({ kind: 'loading' })
   const [attempt, setAttempt] = useState(0)
+  const [fetching, setFetching] = useState(false)
   const query = cleanQuery(urlQuery, USERS_QUERY_MAX)
   const abort = useRef<AbortController | null>(null)
 
@@ -46,17 +47,20 @@ export function UsersTab() {
     abort.current?.abort()
     const ctl = new AbortController()
     abort.current = ctl
-    setLoad({ kind: 'loading' })
+    setLoad((cur) => (cur.kind === 'ready' ? cur : { kind: 'loading' })) // keep the rows on screen while the next page loads: no blank flash
+    setFetching(true)
     settingsApi
       .users({ q: query, page, pageSize: USERS_PAGE_SIZE }, ctl.signal)
       .then((data) => {
         if (ctl.signal.aborted) return
+        setFetching(false)
         // A stale bookmarked page number past the end falls back to page 1.
         if (data.items.length === 0 && data.total > 0 && page > 1) return update({ page: 1 })
         setLoad({ kind: 'ready', data })
       })
       .catch((err) => {
         if (ctl.signal.aborted || (err as { code?: string })?.code === 'ERR_CANCELED') return
+        setFetching(false)
         setLoad({ kind: 'error', message: describeError(err, 'The user list could not be loaded.').message })
       })
     return () => ctl.abort()
@@ -130,7 +134,7 @@ export function UsersTab() {
             <p className="st-count" data-testid="users-count" aria-live="polite">
               Showing {rangeText(data.page, data.page_size, data.total, data.items.length)} {data.total === 1 ? 'person' : 'people'}
             </p>
-            <div className="st-table-wrap">
+            <div className={`st-table-wrap${fetching ? ' is-fetching' : ''}`} aria-busy={fetching}>
               <table className="st-table" data-testid="users-table">
                 <thead>
                   <tr>

@@ -84,10 +84,10 @@ test('the dashboard has no data-source switch, ribbon or demo notice; its one di
   assert.ok(/action="Go to Directory" actionTo="\/directory"/.test(dash))
 })
 
-test('settings API: PUT calls exist only for the two documented writes; nothing puts credentials in a URL or storage', () => {
+test('settings API: PUT calls exist only for the three documented writes; nothing puts credentials in a URL or storage', () => {
   const api = readSrc('modules/settings/api.ts')
   const puts = [...api.matchAll(/api\.put<[^>]*>\('([^']+)'/g)].map((m) => m[1]).sort()
-  assert.deepEqual(puts, ['/preferences/me', '/settings'])
+  assert.deepEqual(puts, ['/preferences/me', '/settings', '/settings/work-schedule']) // my preferences, the HR mood switch, the HR work schedule
   for (const f of settingsFiles) {
     const src = readSrc(f)
     assert.ok(!/localStorage|sessionStorage|document\.cookie/.test(src), `${f} touches storage`)

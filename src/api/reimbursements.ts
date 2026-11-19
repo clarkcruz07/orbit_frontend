@@ -143,6 +143,9 @@ export const reimbursementsApi = {
   list: (scope: Scope, status?: string) =>
     api.get<ReimbursementSummary[]>('/reimbursements', { params: { scope, ...(status ? { status } : {}) } }),
   create: (purpose: string) => api.post<Reimbursement>('/reimbursements', { purpose }),
+  /** The same requests the list shows for this scope and status, as an Excel file (fetched with the signed-in client, then saved from memory). */
+  exportXlsx: (scope: Scope, status?: string) =>
+    api.get<Blob>('/reimbursements/export', { params: { scope, ...(status ? { status } : {}) }, responseType: 'blob', timeout: 60000 }),
   get: (id: string) => api.get<Reimbursement>(base(id)),
   patch: (id: string, body: PatchBody) => api.patch<Reimbursement>(base(id), body),
   /** Multipart upload. The extraction runs inside this request, so the timeout is generous. */

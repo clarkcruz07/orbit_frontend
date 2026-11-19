@@ -203,7 +203,7 @@ export interface DashboardModel {
   directory: BlockState & { total: number | null; full_time: number | null; part_time: number | null; contractor: number | null; intern: number | null }
   hr_cases: BlockState & { active: number | null; high: number | null; medium: number | null; low: number | null; avg_resolution_days: number | null; delta_pct: number | null }
   /** Synced Microsoft people vs the accounts on Users and roles. null when the server does not send the block: the card is then not shown. */
-  microsoft_accounts: (BlockState & { synced: number | null; active_users: number | null; not_signed_in: number | null; roles: { role: string; count: number }[] }) | null
+  microsoft_accounts: (BlockState & { synced: number | null; active_users: number | null; not_signed_in: number | null; by_role: { role: string; count: number }[] }) | null
   birthdays: { name: string; team: string; date: string; avatar_initials: string }[]
   holidays: { month: string | number; day: number; name: string; type: string }[]
   unavailable_blocks: string[]
@@ -242,7 +242,7 @@ export function normaliseDashboard(raw: unknown): DashboardModel {
           synced: num(ms.synced),
           active_users: num(ms.active_users),
           not_signed_in: num(ms.not_signed_in),
-          roles: list(ms.roles)
+          by_role: list(ms.by_role)
             .map((x) => ({ role: String(rec(x).role ?? ''), count: num(rec(x).count) }))
             .filter((x): x is { role: string; count: number } => x.role !== '' && x.count !== null),
         }

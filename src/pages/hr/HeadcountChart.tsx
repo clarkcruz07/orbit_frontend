@@ -40,7 +40,7 @@ export function HeadcountChart({ data }: { data: Point[] }) {
   }
 
   return (
-    <div className="trend-chart" role="img" aria-label={`Headcount from ${formatInt(data[0]?.value)} to ${formatInt(data[last]?.value)} over ${data.length} months`}>
+    <div className="trend-chart" role="img" aria-label={`Headcount from ${formatInt(data[0]?.value)} to ${formatInt(data[last]?.value)} over ${data.length} periods`}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 28, right: 20, left: 0, bottom: 0 }}>
           <defs>

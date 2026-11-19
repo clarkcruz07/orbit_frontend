@@ -231,6 +231,16 @@ export function handleReimbursements(ctx) {
     return send(res, 200, list.map((r) => summary(r, user))) || true
   }
 
+  if (route === '/reimbursements/export' && method === 'GET') {
+    const scope = url.searchParams.get('scope') || 'mine'
+    const status = url.searchParams.get('status')
+    rs.exports = [...(rs.exports ?? []), { scope, status }]
+    if (rs.exportError) return send(res, rs.exportError, { detail: 'Server error' }) || true
+    res.writeHead(200, { 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Content-Disposition': 'attachment; filename="reimbursements-test.xlsx"' })
+    res.end(Buffer.from('PK\u0003\u0004 fake workbook for the browser test'))
+    return true
+  }
+
   if (route === '/reimbursements' && method === 'POST') {
     const purpose = String(json.purpose || '').trim()
     if (!purpose) return send(res, 422, { detail: 'A purpose is required' }) || true
