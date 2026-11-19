@@ -257,6 +257,51 @@ test('HR settings: only the mood switch is left - there is no dashboard data-sou
     assert.equal(count(mock, 'GET /hr/dashboard/source'), 0)
   }))
 
+// ------------------------------------------------------------------------------------------------ work schedule (reminders)
+test('work schedule: HR sees the placeholder defaults, saves a new schedule, and the server refusal is shown in its own words', opts, () =>
+  withApp(U.anna, async ({ page, mock, errors, go }) => {
+    await go('/settings?tab=hr', '[data-testid=schedule-form]')
+    assert.equal(await page.inputValue('[data-testid=schedule-login]'), '09:00')
+    assert.equal(await page.inputValue('[data-testid=schedule-logout]'), '18:00')
+    assert.equal(await page.inputValue('[data-testid=schedule-lead]'), '10')
+    for (const d of [1, 2, 3, 4, 5]) assert.equal(await page.isChecked(`[data-testid=schedule-day-${d}]`), true, `day ${d}`)
+    for (const d of [6, 7]) assert.equal(await page.isChecked(`[data-testid=schedule-day-${d}]`), false, `day ${d}`)
+    assert.match(await text(page, '[data-testid=schedule-note]'), /Asia\/Manila.*placeholder defaults/)
+
+    // An impossible pair: the server's sentence is shown and nothing is saved.
+    await page.fill('[data-testid=schedule-login]', '19:00')
+    await page.click('[data-testid=schedule-save]')
+    await page.waitForSelector('[data-testid=schedule-error]')
+    assert.match(await text(page, '[data-testid=schedule-error]'), /log out time must be after the log in time/)
+    assert.equal(mock.state.scheduleSaved, false)
+
+    // A valid change is saved as typed, and the note stops calling it a placeholder.
+    await page.fill('[data-testid=schedule-login]', '08:30')
+    await page.fill('[data-testid=schedule-logout]', '17:30')
+    await page.fill('[data-testid=schedule-lead]', '15')
+    await page.click('[data-testid=schedule-day-5]')
+    await page.click('[data-testid=schedule-save]')
+    await page.waitForFunction(() => /Saved/.test(document.querySelector('[data-testid=schedule-status]')?.textContent ?? ''))
+    assert.deepEqual(mock.state.schedule, { enabled: true, login_time: '08:30', logout_time: '17:30', days: [1, 2, 3, 4], lead_minutes: 15 })
+    assert.equal(await page.locator('[data-testid=schedule-error]').count(), 0)
+    assert.doesNotMatch(await text(page, '[data-testid=schedule-note]'), /placeholder/)
+    assert.deepEqual(errors, [])
+  }))
+
+test('work schedule: the off switch is saved too, and a person who is not HR never sees the panel', opts, async () => {
+  await withApp(U.anna, async ({ page, mock, go }) => {
+    await go('/settings?tab=hr', '[data-testid=schedule-form]')
+    await page.click('[data-testid=schedule-enabled]')
+    await page.click('[data-testid=schedule-save]')
+    await page.waitForFunction(() => /Saved/.test(document.querySelector('[data-testid=schedule-status]')?.textContent ?? ''))
+    assert.equal(mock.state.schedule.enabled, false)
+  })
+  await withApp(U.carla, async ({ page, go }) => {
+    await go('/settings?tab=hr', '[data-testid=pref-switch-leave]')
+    assert.equal(await page.locator('[data-testid=hr-schedule-panel]').count(), 0)
+  })
+})
+
 // ------------------------------------------------------------------------------------------------ users and roles
 test('users: read-only table with badges, 20 per page, paging, a literal search and no edit controls', opts, () =>
   withApp(U.anna, async ({ page, mock, errors, go }) => {

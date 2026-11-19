@@ -98,6 +98,44 @@ export function normaliseOverview(raw: unknown): SettingsOverview {
   return { company_timezone: text(r.company_timezone), version: text(r.version), roles_editable: r.roles_editable === true }
 }
 
+// ------------------------------------------------------------------------------------------------ work schedule (reminders)
+export interface WorkSchedule {
+  enabled: boolean
+  login_time: string
+  logout_time: string
+  /** ISO weekdays: 1 = Monday ... 7 = Sunday. */
+  days: number[]
+  lead_minutes: number
+  timezone: string
+  is_default: boolean
+}
+
+export const DAY_LABELS: readonly (readonly [number, string])[] = [
+  [1, 'Mon'],
+  [2, 'Tue'],
+  [3, 'Wed'],
+  [4, 'Thu'],
+  [5, 'Fri'],
+  [6, 'Sat'],
+  [7, 'Sun'],
+]
+
+const hhmm = (v: unknown, fallback: string): string => (typeof v === 'string' && /^\d{2}:\d{2}$/.test(v) ? v : fallback)
+
+export function normaliseWorkSchedule(raw: unknown): WorkSchedule {
+  const r = obj(raw)
+  const days = Array.isArray(r.days) ? r.days.filter((d): d is number => Number.isInteger(d) && d >= 1 && d <= 7) : []
+  return {
+    enabled: r.enabled !== false,
+    login_time: hhmm(r.login_time, '09:00'),
+    logout_time: hhmm(r.logout_time, '18:00'),
+    days: days.length ? [...new Set(days)].sort() : [1, 2, 3, 4, 5],
+    lead_minutes: typeof r.lead_minutes === 'number' && Number.isFinite(r.lead_minutes) ? Math.trunc(r.lead_minutes) : 10,
+    timezone: text(r.timezone) ?? 'the company time zone',
+    is_default: r.is_default === true,
+  }
+}
+
 // ------------------------------------------------------------------------------------------------ users and roles
 export interface UserRow {
   user_id: string
@@ -156,6 +194,9 @@ export const settingsApi = {
   settings: () => api.get<unknown>('/settings').then((r) => normaliseSettings(r.data)),
   saveSettings: (patch: { hr_can_see_mood?: boolean }) => api.put<unknown>('/settings', patch).then((r) => normaliseSettings(r.data)),
   overview: () => api.get<unknown>('/settings/overview').then((r) => normaliseOverview(r.data)),
+  workSchedule: () => api.get<unknown>('/settings/work-schedule').then((r) => normaliseWorkSchedule(r.data)),
+  saveWorkSchedule: (body: { enabled: boolean; login_time: string; logout_time: string; days: number[]; lead_minutes: number }) =>
+    api.put<unknown>('/settings/work-schedule', body).then((r) => normaliseWorkSchedule(r.data)),
   users: (params: { q?: string; page?: number; pageSize?: number }, signal?: AbortSignal) =>
     api
       .get<unknown>('/settings/users', { params: { ...(params.q ? { q: params.q } : {}), page: params.page ?? 1, page_size: params.pageSize ?? USERS_PAGE_SIZE }, signal })

@@ -4,6 +4,7 @@ import { Alert } from '@/ui/Feedback'
 import { settingsApi, type HrSettings } from './api'
 import { changedLabel, describeError, moodExplain } from './logic'
 import { Panel, Switch } from './parts'
+import { WorkScheduleCard } from './WorkScheduleCard'
 
 /**
  * "HR settings" (offered only after `GET /settings` answered 200): the `hr_can_see_mood` switch through `PUT /settings`.
@@ -60,6 +61,8 @@ export function HrSettingsTab({ settings, onSettings }: { settings: HrSettings; 
           <Eye size={14} aria-hidden="true" /> {changedLabel(settings.updated.hr_can_see_mood)}
         </p>
       </Panel>
+
+      <WorkScheduleCard />
     </div>
   )
 }

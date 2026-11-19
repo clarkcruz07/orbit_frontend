@@ -127,6 +127,8 @@ export async function startSettingsMock({ distDir }) {
     prefsUpdatedAt: {}, // user_id -> iso
     settings: { hr_can_see_mood: false },
     updated: { hr_can_see_mood: null },
+    schedule: { enabled: true, login_time: '09:00', logout_time: '18:00', days: [1, 2, 3, 4, 5], lead_minutes: 10 },
+    scheduleSaved: false,
     users: makeUsers(),
     liveVariant: liveDashboard, // function returning the dashboard payload (always computed from live data)
     force: {}, // route key -> status code
@@ -215,6 +217,21 @@ export async function startSettingsMock({ distDir }) {
       state.prefs[user.user_id] = { ...(state.prefs[user.user_id] ?? {}), ...g }
       state.prefsUpdatedAt[user.user_id] = new Date().toISOString()
       return send(res, 200, prefItems(user.user_id))
+    }
+
+    // -------------------------------------------------------------------------------- work schedule (HR only)
+    if (route === '/settings/work-schedule') {
+      if (!hr) return send(res, 403, FORBIDDEN)
+      if (method === 'GET') return send(res, 200, { ...state.schedule, timezone: 'Asia/Manila', is_default: !state.scheduleSaved })
+      if (method === 'PUT') {
+        const b = body ?? {}
+        if (!/^\d{2}:\d{2}$/.test(b.login_time ?? '') || !/^\d{2}:\d{2}$/.test(b.logout_time ?? '')) return send(res, 422, { detail: 'Enter the times as HH:MM, for example 09:00.' })
+        if (b.login_time >= b.logout_time) return send(res, 422, { detail: 'The log out time must be after the log in time.' })
+        if (!Array.isArray(b.days) || b.days.length === 0) return send(res, 422, { detail: 'Choose at least one working day.' })
+        state.schedule = { enabled: !!b.enabled, login_time: b.login_time, logout_time: b.logout_time, days: [...b.days].sort(), lead_minutes: b.lead_minutes }
+        state.scheduleSaved = true
+        return send(res, 200, { ...state.schedule, timezone: 'Asia/Manila', is_default: false })
+      }
     }
 
     // -------------------------------------------------------------------------------- HR settings (403 before validation)
