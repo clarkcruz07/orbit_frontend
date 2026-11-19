@@ -8,6 +8,7 @@ import { formatDate } from '@/lib/dates'
 import { authSourceLabel, employmentTypeLabel, personStatusLabel, personStatusTone, rolesText } from '@/lib/people'
 import { Alert, Skeleton } from '@/ui/Feedback'
 import { MyProfileSections } from './MyProfileSections'
+import { VerifiedEmploymentCard } from './VerifiedEmploymentCard'
 import { dateOfBirthFromLabel } from '@/modules/peoplemgmt/profileLogic'
 import { PageTitle } from './PageTitle'
 import './pages.css'
@@ -165,6 +166,8 @@ function Ready({ profile, onUpdated }: { profile: MyProfileData; onUpdated: (nex
           </div>
         </dl>
       </section>
+
+      <VerifiedEmploymentCard />
 
       <MyProfileSections profile={profile.profile} onUpdated={(next) => onUpdated({ ...profile, ...next })} />
 

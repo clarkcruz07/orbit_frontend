@@ -1,6 +1,4 @@
 # ---- secrets and local config: never commit (the example file is the template) ----
-.env
-.env.*
 !.env.example
 !.env.azure
 *.local
@@ -28,9 +26,9 @@ pnpm-debug.log*
 
 # ---- editors and OS ----
 .idea/
-.vscode/
 *.swp
 *~
 .DS_Store
 Thumbs.db
 desktop.ini
+config.bat

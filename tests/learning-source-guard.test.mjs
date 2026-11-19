@@ -2,6 +2,9 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import path from 'node:path'
 import { listSrc, readSrc } from './helpers/load-ts.mjs'
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 const root = path.join(process.cwd(), 'src')
 const rel = (f) => path.relative(root, f).replace(/\\/g, '/')
