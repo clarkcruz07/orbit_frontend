@@ -161,6 +161,9 @@ export function PeopleList() {
           <Link to="/people/import" className="btn btn-secondary" data-testid="import-csv">
             <Upload size={16} aria-hidden="true" /> Import CSV
           </Link>
+          <Link to="/people/import-201" className="btn btn-secondary" data-testid="import-201">
+            <Upload size={16} aria-hidden="true" /> Import 201 file
+          </Link>
         </div>
       ) : null}
     </div>

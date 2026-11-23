@@ -2,6 +2,7 @@ import type { ModuleRoute } from '../registry'
 import { HolidaysPage } from './HolidaysPage'
 import { ImportPage } from './ImportPage'
 import { PeopleList } from './PeopleList'
+import { Profile201Page } from './Profile201Page'
 import { PersonDetail } from './PersonDetail'
 import { PersonNew } from './PersonNew'
 
@@ -14,6 +15,7 @@ const routes: ModuleRoute[] = [
   { path: 'people', element: <PeopleList /> },
   { path: 'people/new', element: <PersonNew /> },
   { path: 'people/import', element: <ImportPage /> },
+  { path: 'people/import-201', element: <Profile201Page /> },
   { path: 'people/:employeeId', element: <PersonDetail /> },
   { path: 'settings/holidays', element: <HolidaysPage /> },
 ]

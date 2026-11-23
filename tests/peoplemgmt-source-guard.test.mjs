@@ -14,12 +14,12 @@ const noCr = (src) => src.replace(/\r/g, '')
 const withoutFormFromPerson = (src) => src.replace(/export function formFromPerson[\s\S]*?\n}\n/, '')
 
 test('the module has its pages, API, logic and routes', () => {
-  for (const f of ['api.ts', 'logic.ts', 'entraSync.ts', 'EntraSyncCard.tsx', 'routes.tsx', 'parts.tsx', 'PeopleList.tsx', 'PersonNew.tsx', 'PersonDetail.tsx', 'PersonFields.tsx', 'AccountCard.tsx', 'PersonDialogs.tsx', 'ImportPage.tsx', 'ImportReportView.tsx', 'HolidaysPage.tsx', 'HolidayForm.tsx', 'RolesFields.tsx']) {
+  for (const f of ['api.ts', 'logic.ts', 'entraSync.ts', 'EntraSyncCard.tsx', 'routes.tsx', 'parts.tsx', 'PeopleList.tsx', 'PersonNew.tsx', 'PersonDetail.tsx', 'PersonFields.tsx', 'AccountCard.tsx', 'PersonDialogs.tsx', 'ImportPage.tsx', 'ImportReportView.tsx', 'Profile201Page.tsx', 'profile201.ts', 'HolidaysPage.tsx', 'HolidayForm.tsx', 'RolesFields.tsx']) {
     assert.ok(files.includes(`modules/peoplemgmt/${f}`), f)
   }
   const routes = readSrc('modules/peoplemgmt/routes.tsx')
-  for (const p of ['people', 'people/new', 'people/import', 'people/:employeeId', 'settings/holidays']) assert.ok(routes.includes(`path: '${p}'`), p)
-  assert.equal((routes.match(/path: '/g) || []).length, 5, 'exactly the five routes, nothing else is mounted')
+  for (const p of ['people', 'people/new', 'people/import', 'people/import-201', 'people/:employeeId', 'settings/holidays']) assert.ok(routes.includes(`path: '${p}'`), p)
+  assert.equal((routes.match(/path: '/g) || []).length, 6, 'exactly the six routes, nothing else is mounted')
 })
 
 test('no role name drives anything: the module never reads the signed-in user, and role literals are display data only', () => {
